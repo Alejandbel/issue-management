@@ -29,6 +29,9 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-await-in-loop": "off",
+    "class-methods-use-this": "off",
+    "@typescript-eslint/no-redeclare": "off",
     "no-console": "error",
     "react/require-default-props": "off",
     "@typescript-eslint/no-explicit-any": "error",
