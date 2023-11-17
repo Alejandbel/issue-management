@@ -1,8 +1,11 @@
-import { DatabaseClient } from '@server/core';
+import { DatabaseClient, BaseRepository } from '@server/core';
 import { inject, injectable } from 'inversify';
 
+import { User } from '../types';
+
 @injectable()
-export class UsersRepository {
-  constructor(@inject(DatabaseClient) private readonly databaseClient: DatabaseClient) {
+export class UsersRepository extends BaseRepository<User> {
+  constructor(@inject(DatabaseClient) databaseClient: DatabaseClient) {
+    super('user', databaseClient);
   }
 }

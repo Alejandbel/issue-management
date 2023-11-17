@@ -5,8 +5,4 @@ import { UsersService } from '../services';
 @injectable()
 export class UsersController {
   @inject(UsersService) private readonly usersService: UsersService;
-
-  constructor() {
-    console.log('UsersController');
-  }
 }

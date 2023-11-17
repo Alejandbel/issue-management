@@ -1,5 +1,5 @@
-import { serverContainer } from '@server/server.module';
-import { UsersController } from '@server/users/controllers';
+import { getController } from '@server';
+import { AuthController } from '@server/auth';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import React from 'react';
@@ -7,7 +7,9 @@ import React from 'react';
 async function signUp(formData: FormData) {
   'use server';
 
-  console.log(await serverContainer.getAsync(UsersController));
+  const authController = await getController(AuthController);
+
+  await authController.signUp(formData);
 }
 
 export default function SignInPage() {
@@ -20,13 +22,13 @@ export default function SignInPage() {
 
         <form action={signUp}>
           <label htmlFor="email" className="block text-900 font-medium mb-2">Email</label>
-          <InputText id="email" type="text" placeholder="Email address" className="w-full mb-3" />
+          <InputText id="email" name="email" type="text" placeholder="Email address" className="w-full mb-3" />
 
           <label htmlFor="name" className="block text-900 font-medium mb-2">Name</label>
-          <InputText id="name" type="text" placeholder="Name" className="w-full mb-3" />
+          <InputText id="name" name="name" type="text" placeholder="Name" className="w-full mb-3" />
 
           <label htmlFor="password" className="block text-900 font-medium mb-2">Password</label>
-          <InputText id="password" type="password" placeholder="Password" className="w-full mb-3" />
+          <InputText id="password" name="password" type="password" placeholder="Password" className="w-full mb-3" />
 
           <Button type="submit" label="Sign Up" icon="pi pi-user" className="w-full" />
         </form>

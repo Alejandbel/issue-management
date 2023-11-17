@@ -24,8 +24,8 @@ export class DatabaseClient {
 
   query<TRes extends QueryResultRow, TParams extends unknown[] = unknown[]>(
     sql: string,
-    parameters: TParams[],
-  ): Promise<QueryResult<QueryResultRow>
+    parameters: TParams,
+  ): Promise<QueryResult<TRes>
     > {
     return this.client.query<TRes>(sql, parameters);
   }
