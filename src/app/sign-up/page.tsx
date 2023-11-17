@@ -1,5 +1,4 @@
-import { getController } from '@server';
-import { AuthController } from '@server/auth';
+import { getController, AuthController } from '@server';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import React from 'react';

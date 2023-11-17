@@ -1,3 +1,5 @@
+-- Up Migration
+
 CREATE TABLE IF NOT EXISTS "user_activity_type"
 (
     "id"        SERIAL PRIMARY KEY,
@@ -38,18 +40,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS "account_key_unique" ON "account" ("key");
 CREATE TABLE IF NOT EXISTS "employee_role"
 (
     "id"           SERIAL PRIMARY KEY,
-    "departmentId" BIGINT,
     "title"        VARCHAR(255) NOT NULL,
-    "createdAt"    TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("departmentId") REFERENCES "department" ("id")
+    "createdAt"    TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+CREATE OR REPLACE FUNCTION "get_user_role_id"()
+    RETURNS BIGINT
+    LANGUAGE "sql" AS
+$$
+SELECT "id"
+FROM "employee_role"
+WHERE "title" = 'user';
+$$;
+
 
 CREATE TABLE IF NOT EXISTS "user"
 (
     "id"           SERIAL PRIMARY KEY,
     "name"         VARCHAR(255) NOT NULL,
     "email"        VARCHAR(255) NOT NULL,
-    "roleId"       BIGINT       NOT NULL,
+    "roleId"       BIGINT       NOT NULL DEFAULT get_user_role_id(),
     "startWorksAt" TIMESTAMP(0),
     "endWorksAt"   TIMESTAMP(0),
     "password"     VARCHAR(255) NOT NULL,
@@ -167,3 +177,50 @@ CREATE TABLE IF NOT EXISTS "user_salary"
     FOREIGN KEY ("userId") REFERENCES "user" ("id")
     );
 CREATE INDEX IF NOT EXISTS "worklog_userid_index" ON "user_salary" ("userId");
+
+
+-- Down Migration
+
+ALTER TABLE "worklog" DROP CONSTRAINT IF EXISTS "worklog_authorid_index";
+ALTER TABLE "worklog" DROP CONSTRAINT IF EXISTS "worklog_issueid_index";
+ALTER TABLE "issue" DROP CONSTRAINT IF EXISTS "issue_typeid_index";
+ALTER TABLE "issue" DROP CONSTRAINT IF EXISTS "issue_versionid_index";
+ALTER TABLE "issue" DROP CONSTRAINT IF EXISTS "issue_statusid_index";
+ALTER TABLE "project_sales_users" DROP CONSTRAINT IF EXISTS "project_sales_users_projectid_index";
+ALTER TABLE "project_sales_users" DROP CONSTRAINT IF EXISTS "project_sales_users_userid_index";
+ALTER TABLE "user_activity" DROP CONSTRAINT IF EXISTS "user_activity_userid_index";
+ALTER TABLE "user_activity" DROP CONSTRAINT IF EXISTS "user_activity_typeid_index";
+ALTER TABLE "version" DROP CONSTRAINT IF EXISTS "version_projectid_index";
+ALTER TABLE "employee_role" DROP CONSTRAINT IF EXISTS "employee_role_departmentid_index";
+ALTER TABLE "user" DROP CONSTRAINT IF EXISTS "user_roleid_index";
+ALTER TABLE "account" DROP CONSTRAINT IF EXISTS "account_key_unique";
+
+DROP INDEX IF EXISTS "worklog_authorid_index";
+DROP INDEX IF EXISTS "worklog_issueid_index";
+DROP INDEX IF EXISTS "issue_typeid_index";
+DROP INDEX IF EXISTS "issue_versionid_index";
+DROP INDEX IF EXISTS "issue_statusid_index";
+DROP INDEX IF EXISTS "project_sales_users_projectid_index";
+DROP INDEX IF EXISTS "project_sales_users_userid_index";
+DROP INDEX IF EXISTS "user_activity_userid_index";
+DROP INDEX IF EXISTS "user_activity_typeid_index";
+DROP INDEX IF EXISTS "version_projectid_index";
+DROP INDEX IF EXISTS "user_roleid_index";
+DROP INDEX IF EXISTS "account_key_unique";
+
+DROP TABLE IF EXISTS "user_salary";
+DROP TABLE IF EXISTS "worklog";
+DROP TABLE IF EXISTS "issue";
+DROP TABLE IF EXISTS "project_sales_users";
+DROP TABLE IF EXISTS "user_activity";
+DROP TABLE IF EXISTS "version";
+DROP TABLE IF EXISTS "project";
+DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS "employee_role";
+DROP TABLE IF EXISTS "account";
+DROP TABLE IF EXISTS "issue_status";
+DROP TABLE IF EXISTS "issue_type";
+DROP TABLE IF EXISTS "department";
+DROP TABLE IF EXISTS "user_activity_type";
+
+DROP FUNCTION IF EXISTS "get_user_role_id";

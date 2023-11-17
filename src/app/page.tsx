@@ -1,10 +1,5 @@
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <Card>
-      <Button label="Submit" />
-    </Card>
-  );
+  redirect('/dashboard');
 }

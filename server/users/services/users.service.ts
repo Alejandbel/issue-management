@@ -8,6 +8,10 @@ import { UsersRepository } from '../repositories';
 export class UsersService {
   @inject(UsersRepository) private readonly usersRepository: UsersRepository;
 
+  find(options?: Partial<User>) {
+    return this.usersRepository.find(options);
+  }
+
   findOne(options: Partial<User>) {
     return this.usersRepository.findOne(options);
   }
@@ -18,11 +22,13 @@ export class UsersService {
     return userId;
   }
 
-  findOneOrFail(options: Partial<User>) {
-    const user = this.usersRepository.findOne(options);
+  async findOneOrFail(options: Partial<User>): Promise<User> {
+    const user = await this.usersRepository.findOne(options);
 
     if (!user) {
       throw new EntityNotFoundError('U');
     }
+
+    return user;
   }
 }

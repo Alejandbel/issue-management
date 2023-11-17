@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { authModule } from '@server/auth';
 import { coreModule } from '@server/core';
 import { usersModule } from '@server/users';
