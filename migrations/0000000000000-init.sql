@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS "user"
 (
     "id"           SERIAL PRIMARY KEY,
     "name"         VARCHAR(255) NOT NULL,
-    "key"          VARCHAR(16)  NOT NULL,
     "email"        VARCHAR(255) NOT NULL,
     "roleId"       BIGINT       NOT NULL,
     "startWorksAt" TIMESTAMP(0),

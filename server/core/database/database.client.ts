@@ -19,7 +19,6 @@ export class DatabaseClient {
 
   @postConstruct()
   async connect() {
-    console.log('connected');
     await this.client.connect();
   }
 

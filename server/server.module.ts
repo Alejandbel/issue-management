@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 import { coreModule } from '@server/core';
 import { usersModule } from '@server/users';
+import { UsersController } from '@server/users/controllers';
 import { Container, ContainerModule } from 'inversify';
 
 const modules = [usersModule, coreModule];
-const serverContainer = new Container();
+export const serverContainer = new Container({ defaultScope: 'Singleton' });
 
 export async function initializeServer(): Promise<void> {
   for (const containerModule of modules) {
@@ -14,4 +15,6 @@ export async function initializeServer(): Promise<void> {
       await serverContainer.loadAsync(containerModule);
     }
   }
+
+  console.log(await serverContainer.getAsync(UsersController));
 }

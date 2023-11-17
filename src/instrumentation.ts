@@ -1,5 +1,7 @@
 export async function register() {
-  const { initializeServer } = await import('@server/index');
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { initializeServer } = await import('@server/index');
 
-  await initializeServer();
+    await initializeServer();
+  }
 }
