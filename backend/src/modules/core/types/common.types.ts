@@ -6,3 +6,10 @@ export const SORT_DIRECTION = {
 } as const;
 
 export type SortDirection = (typeof SORT_DIRECTION)[keyof typeof SORT_DIRECTION];
+
+export type ItemListOptions<TSortFiled extends string> = {
+  sortField: TSortFiled;
+  sortDirection: SortDirection;
+  limit: number;
+  offset: number;
+};

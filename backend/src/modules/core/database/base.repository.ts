@@ -53,22 +53,30 @@ export class BaseRepository<TEntity extends Record<string, unknown> & { id: numb
   }
 
   async find(
-    options: Partial<TEntity> = {},
-    pagination: { limit?: number; offset?: number } = {},
-    { sortField, sortDirection }: { sortField?: keyof TEntity; sortDirection?: SortDirection } = {},
+    where: Partial<TEntity> = {},
+    {
+      sortField,
+      sortDirection,
+      offset,
+      limit,
+    }: { limit?: number; offset?: number; sortField?: keyof TEntity; sortDirection?: SortDirection } = {},
   ): Promise<TEntity[]> {
     const [query, params] = this.databaseClient.escapeQueryWithParameters(
       `
           SELECT *
           FROM "${this.entityName}"
           WHERE TRUE
-              ${this.formWhereClause(options)}
-          ${pagination.limit ? ' LIMIT :limit' : ''} 
-          ${pagination.offset ? ' OFFSET :offset' : ''}
-          ${sortField && sortDirection ? ` ORDER BY "${this.entityName}" ${sortDirection}` : ''}
+              ${this.formWhereClause(where)}
+          ${
+            sortField && sortDirection
+              ? ` ORDER BY "${this.entityName}"."${sortField.toString()}" ${sortDirection}`
+              : ''
+          }
+          ${limit ? ' LIMIT :limit' : ''} 
+          ${offset ? ' OFFSET :offset' : ''}
           ;
       `,
-      { ...options, ...pagination },
+      { ...where, sortField, sortDirection, offset, limit },
     );
 
     const res = await this.databaseClient.query<TEntity>(query, params);
@@ -76,14 +84,38 @@ export class BaseRepository<TEntity extends Record<string, unknown> & { id: numb
     return res.rows;
   }
 
-  protected formWhereClause(options: Partial<TEntity>, entityName: string = this.entityName): string {
-    return Object.keys(options)
+  async findWithCount(
+    where: Partial<TEntity> = {},
+    options: { limit?: number; offset?: number; sortField?: keyof TEntity; sortDirection?: SortDirection } = {},
+  ): Promise<[TEntity[], number]> {
+    return Promise.all([this.find(where, options), this.count(where)]);
+  }
+
+  async count(where: Partial<TEntity> = {}): Promise<number> {
+    const [query, params] = this.databaseClient.escapeQueryWithParameters(
+      `
+          SELECT COUNT(*) as total
+          FROM "${this.entityName}"
+          WHERE TRUE
+              ${this.formWhereClause(where)}
+          ;
+      `,
+      where,
+    );
+
+    const res = await this.databaseClient.query<TEntity>(query, params);
+
+    return parseInt(res.rows[0].total as string);
+  }
+
+  protected formWhereClause(where: Partial<TEntity>, entityName: string = this.entityName): string {
+    return Object.keys(where)
       .map((key) => `AND "${entityName}"."${key}" = :${key}`)
       .join('\n');
   }
 
-  async findOne(options: Partial<TEntity> = {}): Promise<TEntity | undefined> {
-    const res = await this.find(options, { limit: 1 });
+  async findOne(where: Partial<TEntity> = {}): Promise<TEntity | undefined> {
+    const res = await this.find(where, { limit: 1 });
     return res[0];
   }
 }

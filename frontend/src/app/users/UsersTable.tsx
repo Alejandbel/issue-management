@@ -3,15 +3,15 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 
-import Table, { TableColumn } from '@/components/Table';
+import { TableColumn, Table } from '@/components/Table';
 import { usersService } from '@/services/api';
 import { SortDirection, User } from '@/types';
 
-type UsersTableProps = { defaultUsers: { items: Omit<User, 'password'>[] } };
-
-export function UsersTable({ defaultUsers }: UsersTableProps) {
+export function UsersTable() {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
+  const [limit, setLimit] = useState<number | undefined>(5);
+  const [offset, setOffset] = useState< number | undefined>(0);
 
   const {
     data,
@@ -19,12 +19,13 @@ export function UsersTable({ defaultUsers }: UsersTableProps) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['/users', sortField, sortDirection],
+    queryKey: ['/users', sortField, sortDirection, limit, offset],
     queryFn: () => usersService.getUsers({
       sortField,
       sortDirection,
+      limit,
+      offset,
     }),
-    initialData: defaultUsers,
   });
 
   if (!isSuccess || isLoading || error) {
@@ -67,21 +68,25 @@ export function UsersTable({ defaultUsers }: UsersTableProps) {
   ];
 
   const onUpdate = (newValue: Omit<User, 'password'>) => void usersService.updateUser(newValue.id, newValue);
-  const onSort = (filed: string, direction?: SortDirection) => {
+  const onStateChange = (filed: string, direction?: SortDirection, limitState?: number, offsetState?: number) => {
     setSortField(filed);
     setSortDirection(direction);
+    setLimit(limitState);
+    setOffset(offsetState);
   };
 
   return (
     <Table
       items={data.items}
-      first={1}
-      totalRecords={data.items.length}
+      limit={limit}
+      offset={offset}
+      totalRecords={data.count}
       onUpdate={onUpdate}
-      onSort={onSort}
+      onStateChange={onStateChange}
       columns={columns}
       defaultSortField={sortField}
       defaultSortOrder={sortDirection}
+      limitStep={5}
     />
   );
 }

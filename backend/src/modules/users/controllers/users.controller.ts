@@ -29,8 +29,8 @@ export class UsersController extends BaseHttpController {
 
   @httpGet('/', AuthorizedMiddleware, applyQueryValidation(getUsersListQuerySchema))
   async getUsersList(@queryParam() query: UsersListOptions): Promise<IHttpActionResult> {
-    const users = await this.usersService.find(query);
-    return this.json({ items: users });
+    const [items, count] = await this.usersService.findWithCount(query);
+    return this.json({ items, count });
   }
 
   @httpPatch('/:id', applyParamsValidation(idParamsSchema), applyBodyValidation(updateUserBodySchema))

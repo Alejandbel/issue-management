@@ -2,12 +2,14 @@ import { z } from 'zod';
 
 import { USERS_SORT_FIELD } from '../types';
 
-import { dateSchema, sortDirectionSchema } from '@modules/core';
+import { dateSchema, numberSchema, sortDirectionSchema } from '@modules/core';
 
 export const getUsersListQuerySchema = z
   .object({
     sortDirection: sortDirectionSchema.nullish(),
-    sortFiled: z.enum(Object.values(USERS_SORT_FIELD) as [string, ...string[]]).nullish(),
+    sortField: z.enum(Object.values(USERS_SORT_FIELD) as [string, ...string[]]).nullish(),
+    limit: numberSchema.optional(),
+    offset: numberSchema.optional(),
   })
   .strip();
 

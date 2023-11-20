@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { getUsersListQuerySchema, updateUserBodySchema } from '../schemas';
 
-import { SortDirection } from '@modules/core';
+import { ItemListOptions, SortDirection } from '@modules/core';
 import { EMPLOYEE_ROLE } from '@modules/users';
 
 export type User = {
@@ -26,10 +26,7 @@ export type UserWithRole = {
 
 export type UserToUpdate = z.infer<typeof updateUserBodySchema>;
 
-export type UsersListOptions = {
-  sortField: USERS_SORT_FIELD;
-  sortDirection: SortDirection;
-};
+export type UsersListOptions = ItemListOptions<USERS_SORT_FIELD>;
 
 export enum USERS_SORT_FIELD {
   ID = 'id',

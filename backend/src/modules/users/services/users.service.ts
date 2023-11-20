@@ -9,8 +9,8 @@ import { EntityNotFoundError } from '@modules/core';
 export class UsersService {
   @inject(UsersRepository) private readonly usersRepository: UsersRepository;
 
-  async find(options: UsersListOptions): Promise<User[]> {
-    return this.usersRepository.find({}, {}, options);
+  async findWithCount(options: UsersListOptions): Promise<[User[], number]> {
+    return this.usersRepository.findWithCount({}, options);
   }
 
   async findOne(options: Partial<User>): Promise<User | undefined> {
