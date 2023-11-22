@@ -1,23 +1,22 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { revalidatePath } from 'next/cache';
 import React, { FormEvent, useState } from 'react';
 import { z } from 'zod';
 
-import { CreateAccountForm } from '@/app/accounts/CreateAccountForm';
+import { AccountForm } from '@/app/accounts/AccountForm';
 import { TableColumn, Table } from '@/components/Table';
 import { accountsService } from '@/services/api/accounts.service';
 import { Account, SortDirection } from '@/types';
 import { validateForm } from '@/utils';
 
-export const createAccountBodySchema = z
+export const accountBodySchema = z
   .object({
+    id: z.preprocess(Number, z.number()).optional(),
     title: z.string().max(255),
     key: z.string().max(16),
   })
-  .strip()
-  .required();
+  .strip();
 
 export function AccountsTable() {
   const [sortField, setSortField] = useState('title');
@@ -57,18 +56,15 @@ export function AccountsTable() {
       header: 'Title',
       type: 'string',
       sortable: true,
-      editable: true,
     },
     {
       field: 'key',
       header: 'Key',
       type: 'string',
       sortable: true,
-      editable: true,
     },
   ];
 
-  const onUpdate = (newValue: Account) => void accountsService.updateAccount(newValue.id, newValue);
   const onStateChange = (filed: string, direction?: SortDirection, limitState?: number, offsetState?: number) => {
     setSortField(filed);
     setSortDirection(direction);
@@ -79,11 +75,18 @@ export function AccountsTable() {
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const account = validateForm(event.currentTarget, createAccountBodySchema);
+    const account = validateForm(event.currentTarget, accountBodySchema);
 
-    await accountsService.createAccount(account);
-    refetch();
+    if (account.id) {
+      await accountsService.updateAccount(account.id, account);
+    } else {
+      await accountsService.createAccount(account);
+    }
+
+    await refetch();
   };
+
+  const form = (defaultAccount?: Account) => <AccountForm defaultAccount={defaultAccount} />;
 
   return (
     <Table
@@ -91,14 +94,14 @@ export function AccountsTable() {
       limit={limit}
       offset={offset}
       totalRecords={data.count}
-      onUpdate={onUpdate}
       onStateChange={onStateChange}
       columns={columns}
       defaultSortField={sortField}
       defaultSortOrder={sortDirection}
       limitStep={5}
       onSave={onSave}
-      dialogForm={<CreateAccountForm />}
+      dialogForm={form}
+      actions={['update', 'create']}
     />
   );
 }

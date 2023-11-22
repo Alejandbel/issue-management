@@ -1,4 +1,5 @@
 import { injectable, unmanaged } from 'inversify';
+import migrate from 'node-pg-migrate';
 
 import { DatabaseClient } from './database.client';
 

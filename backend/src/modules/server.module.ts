@@ -13,7 +13,9 @@ export async function initializeContainer(): Promise<Container> {
     await serverContainer.loadAsync(containerModule);
   }
 
-  await serverContainer.get(DatabaseClient).connect();
+  const db = serverContainer.get(DatabaseClient);
+  await db.connect();
+  await db.migrate();
 
   return serverContainer;
 }

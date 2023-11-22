@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { Client, QueryResult, QueryResultRow } from 'pg';
 
 import { ConfigService } from '../config';
+import migrate from 'node-pg-migrate';
 
 @injectable()
 export class DatabaseClient {
@@ -19,6 +20,10 @@ export class DatabaseClient {
 
   async connect(): Promise<void> {
     await this.client.connect();
+  }
+
+  async migrate(): Promise<void> {
+    await migrate({ dbClient: this.client, migrationsTable: 'pgmigrations', dir: './migrations', direction: 'up' });
   }
 
   query<TRes extends QueryResultRow, TParams extends unknown[] = unknown[]>(

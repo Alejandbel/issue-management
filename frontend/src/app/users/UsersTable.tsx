@@ -1,23 +1,33 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
+import { z } from 'zod';
 
-import { TableColumn, Table } from '@/components/Table';
+import { UserForm } from '@/app/users/UserForm';
+import { Table, TableColumn } from '@/components/Table';
 import { usersService } from '@/services/api';
 import { SortDirection, User } from '@/types';
+import { validateForm } from '@/utils';
+
+const userSchema = z.object({
+  id: z.preprocess(Number, z.number()),
+  startWorksAt: z.preprocess((v) => new Date(v), z.date()),
+  endWorksAt: z.preprocess((v) => new Date(v), z.date()),
+});
 
 export function UsersTable() {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
-  const [offset, setOffset] = useState< number | undefined>(0);
+  const [offset, setOffset] = useState<number | undefined>(0);
 
   const {
     data,
     isSuccess,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['/users', sortField, sortDirection, limit, offset],
     queryFn: () => usersService.getUsers({
@@ -52,22 +62,19 @@ export function UsersTable() {
       sortable: true,
     },
     {
-      field: 'endWorksAt',
-      header: 'End works at',
-      type: 'date',
-      editable: true,
-      sortable: true,
-    },
-    {
       field: 'startWorksAt',
       header: 'Start works at',
       type: 'date',
-      editable: true,
+      sortable: true,
+    },
+    {
+      field: 'endWorksAt',
+      header: 'End works at',
+      type: 'date',
       sortable: true,
     },
   ];
 
-  const onUpdate = (newValue: Omit<User, 'password'>) => void usersService.updateUser(newValue.id, newValue);
   const onStateChange = (filed: string, direction?: SortDirection, limitState?: number, offsetState?: number) => {
     setSortField(filed);
     setSortDirection(direction);
@@ -75,18 +82,34 @@ export function UsersTable() {
     setOffset(offsetState);
   };
 
+  const onSave = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const user = validateForm(event.currentTarget, userSchema);
+
+    if (user.id) {
+      await usersService.updateUser(user.id, user);
+    }
+
+    await refetch();
+  };
+
+  const form = (defaultUser?: Omit<User, 'password'>) => <UserForm defaultUser={defaultUser} />;
+
   return (
     <Table
       items={data.items}
       limit={limit}
       offset={offset}
       totalRecords={data.count}
-      onUpdate={onUpdate}
       onStateChange={onStateChange}
       columns={columns}
       defaultSortField={sortField}
       defaultSortOrder={sortDirection}
       limitStep={5}
+      onSave={onSave}
+      dialogForm={form}
+      actions={['update']}
     />
   );
 }

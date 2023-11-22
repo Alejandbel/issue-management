@@ -35,9 +35,8 @@ export class AccountsService {
   private async validateKeyForUniqueness(key: string, originalId?: number): Promise<void> {
     const account = await this.findOne({
       key,
-      ...(originalId ? { id: originalId } : {}),
     });
-    if (account) {
+    if (account && account.id !== originalId) {
       throw new ServiceError(`Account with key ${key} already exists`);
     }
   }

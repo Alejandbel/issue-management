@@ -1,12 +1,13 @@
 'use client';
 
 import { SortOrder } from 'primereact/api';
-import { Column, ColumnEvent } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Column } from 'primereact/column';
 import { DataTable, DataTableStateEvent } from 'primereact/datatable';
-import React, { FormEvent, useState } from 'react';
+import { Dialog } from 'primereact/dialog';
+import { Toolbar } from 'primereact/toolbar';
+import React, { FormEvent, useRef, useState } from 'react';
 
-import { ItemDialog } from './ItemDialog';
-import { cellEditor } from './editors';
 import { parseBasedOnType } from './helpers';
 import { Parsable, TableColumn } from './types';
 import { NumberToSortDirection, SortDirection, SortDirectionToNumber } from '@/types';
@@ -14,7 +15,6 @@ import { NumberToSortDirection, SortDirection, SortDirectionToNumber } from '@/t
 type TableProps<T extends Record<string, Parsable>> = {
   items: T[];
   onStateChange?: (sortField: string, sortDirection?: SortDirection, limit?: number, offset?: number) => void | Promise<void>;
-  onUpdate?: (newValue: T) => void | Promise<void>;
   columns: TableColumn<T>[];
   defaultSortField?: string;
   defaultSortOrder?: SortDirection | null;
@@ -23,17 +23,18 @@ type TableProps<T extends Record<string, Parsable>> = {
   limit?: number;
   limitStep?: number;
 } & ({
-  onSave: (e: FormEvent<HTMLFormElement>) => void;
-  dialogForm: React.ReactNode;
+  onSave: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
+  dialogForm: (defaultItem?: T) => React.ReactNode;
+  actions: ('delete' | 'update' | 'create')[]
 } | {
   onSave?: undefined;
   dialogForm?: undefined;
+  actions?: undefined;
 });
 
 export function Table<T extends Record<string, Parsable>>({
   items,
   onStateChange,
-  onUpdate,
   columns,
   defaultSortOrder,
   defaultSortField,
@@ -43,11 +44,15 @@ export function Table<T extends Record<string, Parsable>>({
   limitStep = limit,
   dialogForm,
   onSave,
+  actions,
 }: TableProps<T>) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder | undefined>(
     defaultSortField ? SortDirectionToNumber[defaultSortOrder!] : undefined,
   );
   const [sortFiled, setSortFiled] = useState(defaultSortField);
+  const [defaultItem, setDefaultItem] = useState<T | undefined>();
 
   const fieldToColumnMap = new Map(columns.map((column) => [column.field, column]));
 
@@ -66,23 +71,31 @@ export function Table<T extends Record<string, Parsable>>({
 
   paginated.splice(offset, limit, ...parsedItems);
 
-  const sortFunction = () => paginated;
+  const hideDialog = () => {
+    setIsVisible(false);
+  };
 
-  const onCellEditComplete = (e: ColumnEvent) => {
-    const {
-      rowData,
-      newValue,
-      field,
-    } = e;
+  const openDialog = () => {
+    setIsVisible(true);
+  };
 
-    const column = fieldToColumnMap.get(field);
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    await onSave?.(e);
+    hideDialog();
+  };
 
-    if (!column) {
-      return;
-    }
+  const submitForm = () => {
+    formRef.current?.requestSubmit();
+  };
 
-    rowData[field] = parseBasedOnType(newValue, column.type);
-    onUpdate?.(rowData);
+  const createProduct = () => {
+    setDefaultItem(undefined);
+    openDialog();
+  };
+
+  const editProduct = (rowData: T) => {
+    setDefaultItem(rowData);
+    openDialog();
   };
 
   const stateChangeFunction = async (event: DataTableStateEvent) => {
@@ -91,9 +104,36 @@ export function Table<T extends Record<string, Parsable>>({
     setSortOrder(event.sortOrder ?? undefined);
   };
 
+  const actionBodyTemplate = (rowData: T) => (
+    <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} />
+  );
+
   return (
     <>
-      {onSave ? <ItemDialog onSave={onSave} dialogForm={dialogForm} /> : null}
+      {onSave && actions?.includes('create') ? (
+        <Toolbar start={(
+          <div className="flex flex-wrap gap-2">
+            <Button label="New" icon="pi pi-plus" severity="success" onClick={createProduct} />
+          </div>
+        )}
+        />
+      ) : null}
+      {onSave && (
+      <Dialog
+        visible={isVisible}
+        onHide={hideDialog}
+        footer={(
+          <>
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
+            <Button label="Save" icon="pi pi-check" onClick={submitForm} />
+          </>
+        )}
+      >
+        <form ref={formRef} onSubmit={onSubmit}>
+          {dialogForm(defaultItem)}
+        </form>
+      </Dialog>
+      )}
       <DataTable
         value={paginated}
         sortField={sortFiled?.toString()}
@@ -116,18 +156,14 @@ export function Table<T extends Record<string, Parsable>>({
             header: column.header,
             ...(column.sortable ? {
               sortable: true,
-              sortFunction,
-            } : {}),
-            ...(column.editable ? {
-              editor: cellEditor[column.type],
-              onCellEditComplete,
+              sortFunction: () => paginated,
             } : {}),
           };
 
           return <Column key={column.field.toString()} {...props} />;
         })}
+        {actions?.includes('update') ? <Column body={actionBodyTemplate} /> : null}
       </DataTable>
     </>
-
   );
 }
