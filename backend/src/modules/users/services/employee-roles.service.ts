@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 
+import { EntityNotFoundError } from '@modules/core';
+
 import { EmployeeRolesRepository } from '../repositories';
 import { EmployeeRole } from '../types';
-
-import { EntityNotFoundError } from '@modules/core';
 
 @injectable()
 export class EmployeeRolesService {

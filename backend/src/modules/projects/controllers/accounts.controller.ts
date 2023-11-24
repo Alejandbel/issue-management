@@ -11,10 +11,6 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { createAccountBodySchema, getAccountsListQuerySchema, updateAccountBodySchema } from '../schemas';
-import { AccountsService } from '../services';
-import { AccountsListOptions, AccountToUpdate } from '../types';
-
 import { AuthorizedMiddleware } from '@modules/auth/middlewares';
 import {
   applyBodyValidation,
@@ -23,6 +19,10 @@ import {
   idParamsSchema,
   ParamsId,
 } from '@modules/core';
+
+import { createAccountBodySchema, getAccountsListQuerySchema, updateAccountBodySchema } from '../schemas';
+import { AccountsService } from '../services';
+import { AccountsListOptions, AccountToUpdate } from '../types';
 
 @controller('/accounts')
 export class AccountsController extends BaseHttpController {

@@ -1,9 +1,8 @@
 import { injectable, unmanaged } from 'inversify';
-import migrate from 'node-pg-migrate';
-
-import { DatabaseClient } from './database.client';
 
 import { SortDirection } from '@modules/core';
+
+import { DatabaseClient } from './database.client';
 
 @injectable()
 export class BaseRepository<TEntity extends Record<string, unknown> & { id: number }> {

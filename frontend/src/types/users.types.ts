@@ -1,3 +1,5 @@
+import { Role } from './employee-roles.types';
+
 export type User = {
   id: number;
   email: string;
@@ -6,4 +8,8 @@ export type User = {
   endWorksAt: Date | null;
   roleId: number;
   name: string;
+};
+
+export type UserWithRole = Omit<User, 'password'> & {
+  role: Role
 };

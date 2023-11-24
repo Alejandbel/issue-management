@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { USERS_SORT_FIELD } from '../types';
-
 import { dateSchema, numberSchema, sortDirectionSchema } from '@modules/core';
+
+import { USERS_SORT_FIELD } from '../types';
 
 export const getUsersListQuerySchema = z
   .object({

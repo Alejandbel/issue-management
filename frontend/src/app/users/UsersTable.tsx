@@ -7,13 +7,13 @@ import { z } from 'zod';
 import { UserForm } from '@/app/users/UserForm';
 import { Table, TableColumn } from '@/components/Table';
 import { usersService } from '@/services/api';
-import { SortDirection, User } from '@/types';
+import { SortDirection, User, UserWithRole } from '@/types';
 import { validateForm } from '@/utils';
 
 const userSchema = z.object({
-  id: z.preprocess(Number, z.number()),
-  startWorksAt: z.preprocess((v) => new Date(v), z.date()),
-  endWorksAt: z.preprocess((v) => new Date(v), z.date()),
+  id: z.coerce.number(),
+  startWorksAt: z.coerce.date(),
+  endWorksAt: z.coerce.date(),
 });
 
 export function UsersTable() {
@@ -42,7 +42,7 @@ export function UsersTable() {
     return null;
   }
 
-  const columns: TableColumn<Omit<User, 'password'>>[] = [
+  const columns: TableColumn<UserWithRole>[] = [
     {
       field: 'id',
       header: 'Id',
@@ -54,6 +54,11 @@ export function UsersTable() {
       header: 'Name',
       type: 'string',
       sortable: true,
+    },
+    {
+      field: 'role',
+      header: 'Employee role',
+      type: 'string',
     },
     {
       field: 'email',

@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 
-import { EmployeeRole } from '../types';
-
 import { BaseRepository, DatabaseClient } from '@modules/core';
+
+import { EmployeeRole } from '../types';
 
 @injectable()
 export class EmployeeRolesRepository extends BaseRepository<EmployeeRole> {

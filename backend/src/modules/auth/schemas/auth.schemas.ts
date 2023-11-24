@@ -8,3 +8,11 @@ export const signUpBodySchema = z
   })
   .strip()
   .required();
+
+export const signInBodySchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string(),
+  })
+  .strip()
+  .required();

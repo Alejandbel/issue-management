@@ -1,5 +1,5 @@
 import axios from './axios';
-import { SortDirection, User } from '@/types';
+import { SortDirection, User, UserWithRole } from '@/types';
 
 export const usersService = {
   getUsers: async (params: {
@@ -7,7 +7,7 @@ export const usersService = {
     sortDirection?: SortDirection,
     limit?: number,
     offset?: number
-  }, cookie?: string): Promise<{ items: Omit<User, 'password'>[], count: number }> => {
+  }, cookie?: string): Promise<{ items: UserWithRole[], count: number }> => {
     const { data } = await axios.get('/users', {
       params,
       headers: {

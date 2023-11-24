@@ -8,7 +8,7 @@ import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
 import React, { FormEvent, useRef, useState } from 'react';
 
-import { parseBasedOnType } from './helpers';
+import { getTemplate } from './helpers';
 import { Parsable, TableColumn } from './types';
 import { NumberToSortDirection, SortDirection, SortDirectionToNumber } from '@/types';
 
@@ -54,22 +54,11 @@ export function Table<T extends Record<string, Parsable>>({
   const [sortFiled, setSortFiled] = useState(defaultSortField);
   const [defaultItem, setDefaultItem] = useState<T | undefined>();
 
-  const fieldToColumnMap = new Map(columns.map((column) => [column.field, column]));
-
-  const parsedItems = items.map((item) => {
-    const parsedItem: Record<string, string | null | undefined | number> = {};
-
-    for (const [key, { type }] of fieldToColumnMap.entries()) {
-      parsedItem[key as string] = parseBasedOnType(item[key], type);
-    }
-
-    return parsedItem;
-  });
-
   // workaround for pagination
   const paginated = Array.from(new Array(totalRecords), () => undefined) as unknown as Record<string, Parsable>[];
 
-  paginated.splice(offset, limit, ...parsedItems);
+  paginated.splice(offset, limit, ...items);
+  console.log(paginated);
 
   const hideDialog = () => {
     setIsVisible(false);
@@ -119,20 +108,20 @@ export function Table<T extends Record<string, Parsable>>({
         />
       ) : null}
       {onSave && (
-      <Dialog
-        visible={isVisible}
-        onHide={hideDialog}
-        footer={(
-          <>
-            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" onClick={submitForm} />
-          </>
-        )}
-      >
-        <form ref={formRef} onSubmit={onSubmit}>
-          {dialogForm(defaultItem)}
-        </form>
-      </Dialog>
+        <Dialog
+          visible={isVisible}
+          onHide={hideDialog}
+          footer={(
+            <>
+              <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
+              <Button label="Save" icon="pi pi-check" onClick={submitForm} />
+            </>
+          )}
+        >
+          <form ref={formRef} onSubmit={onSubmit}>
+            {dialogForm(defaultItem)}
+          </form>
+        </Dialog>
       )}
       <DataTable
         value={paginated}
@@ -152,13 +141,16 @@ export function Table<T extends Record<string, Parsable>>({
       >
         {columns.map((column) => {
           const props: Record<string, unknown> = {
-            field: column.field.toString(),
             header: column.header,
+            field: column.field.toString(),
             ...(column.sortable ? {
               sortable: true,
               sortFunction: () => paginated,
             } : {}),
+            body: (data: T) => getTemplate<T>(data, column.field, column.type ?? column.template),
           };
+
+          console.log(props);
 
           return <Column key={column.field.toString()} {...props} />;
         })}

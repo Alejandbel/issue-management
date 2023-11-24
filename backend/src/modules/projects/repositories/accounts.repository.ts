@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 
-import { Account } from '../types';
-
 import { DatabaseClient, BaseRepository } from '@modules/core';
+
+import { Account } from '../types';
 
 @injectable()
 export class AccountsRepository extends BaseRepository<Account> {

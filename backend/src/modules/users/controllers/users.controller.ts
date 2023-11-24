@@ -10,10 +10,6 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { getUsersListQuerySchema, updateUserBodySchema } from '../schemas';
-import { UsersService } from '../services';
-import { UsersListOptions, UserToUpdate } from '../types';
-
 import { AuthorizedMiddleware } from '@modules/auth/middlewares';
 import {
   applyBodyValidation,
@@ -23,13 +19,17 @@ import {
   ParamsId,
 } from '@modules/core';
 
+import { getUsersListQuerySchema, updateUserBodySchema } from '../schemas';
+import { UsersService } from '../services';
+import { UsersListOptions, UserToUpdate } from '../types';
+
 @controller('/users')
 export class UsersController extends BaseHttpController {
   @inject(UsersService) private readonly usersService: UsersService;
 
   @httpGet('/', AuthorizedMiddleware, applyQueryValidation(getUsersListQuerySchema))
   async getUsersList(@queryParam() query: UsersListOptions): Promise<IHttpActionResult> {
-    const [items, count] = await this.usersService.findWithCount(query);
+    const [items, count] = await this.usersService.findWithRolesWithCount(query);
     return this.json({ items, count });
   }
 

@@ -1,18 +1,33 @@
-import { ColumnType, Parsable } from './types';
+import React from 'react';
 
-export function parseBasedOnType(value: Parsable, type: ColumnType) {
-  if (value === null || value === undefined) {
-    return value;
+import { ColumnType } from './types';
+
+export function getTemplate<
+  T,
+  TKey extends keyof T = keyof T,
+>(data: T | null, key: TKey, typeOrTemplate: ColumnType | ((val: T[TKey]) => React.ReactNode)): React.ReactNode {
+  if (!data) {
+    return null;
   }
 
-  switch (type) {
-    case 'string':
-      return String(value);
-    case 'date':
-      return new Date(value).toLocaleDateString();
-    case 'numeric':
-      return value as number;
-    default:
-      throw new Error('Unknown type');
+  const value = data[key];
+
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof typeOrTemplate === 'string') {
+    switch (typeOrTemplate) {
+      case 'string':
+        return String(value);
+      case 'date':
+        return (value as unknown as Date).toString();
+      case 'numeric':
+        return value as number;
+      default:
+        throw new Error('Unknown type');
+    }
+  } else {
+    return typeOrTemplate(value);
   }
 }

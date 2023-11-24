@@ -1,16 +1,16 @@
 import { inject, injectable } from 'inversify';
 
+import { EntityNotFoundError } from '@modules/core';
+
 import { UsersRepository } from '../repositories';
 import { User, UsersListOptions, UserToUpdate, UserWithRole } from '../types';
-
-import { EntityNotFoundError } from '@modules/core';
 
 @injectable()
 export class UsersService {
   @inject(UsersRepository) private readonly usersRepository: UsersRepository;
 
-  async findWithCount(options: UsersListOptions): Promise<[User[], number]> {
-    return this.usersRepository.findWithCount({}, options);
+  async findWithRolesWithCount(options: UsersListOptions): Promise<[UserWithRole[], number]> {
+    return Promise.all([this.usersRepository.findWithRoles({}, options), this.usersRepository.count()]);
   }
 
   async findOne(options: Partial<User>): Promise<User | undefined> {

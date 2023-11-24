@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
-import { signUpBodySchema } from '../schemas';
+import { signInBodySchema, signUpBodySchema } from '../schemas';
 
 export type SignUpUser = z.infer<typeof signUpBodySchema>;
+export type SignInUser = z.infer<typeof signInBodySchema>;

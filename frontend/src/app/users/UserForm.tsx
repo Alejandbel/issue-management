@@ -2,10 +2,10 @@ import { Calendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
 import React from 'react';
 
-import { User } from '@/types';
+import { UserWithRole } from '@/types';
 
 type UserFormProps = {
-  defaultUser?: Omit<User, 'password'>;
+  defaultUser?: UserWithRole;
 };
 
 export function UserForm({ defaultUser }: UserFormProps) {
@@ -20,10 +20,24 @@ export function UserForm({ defaultUser }: UserFormProps) {
       <InputText id="key" value={defaultUser?.email} name="key" required />
 
       <label htmlFor="startWorksAt" className="block text-900 font-medium mb-2">Start works at</label>
-      <Calendar id="startWorksAt" placeholder={defaultUser?.startWorksAt?.toString()} value={defaultUser?.startWorksAt} name="startWorksAt" className="w-full mb-3" required />
+      <Calendar
+        id="startWorksAt"
+        placeholder={defaultUser?.startWorksAt?.toString()}
+        value={defaultUser?.startWorksAt}
+        name="startWorksAt"
+        className="w-full mb-3"
+        required
+      />
 
       <label htmlFor="endWorksAt" className="block text-900 font-medium mb-2">End works at</label>
-      <Calendar id="endWorksAt" placeholder={defaultUser?.endWorksAt?.toString()} value={defaultUser?.endWorksAt} name="endWorksAt" className="w-full mb-3" required />
+      <Calendar
+        id="endWorksAt"
+        placeholder={defaultUser?.endWorksAt?.toString()}
+        value={defaultUser?.endWorksAt}
+        name="endWorksAt"
+        className="w-full mb-3"
+        required
+      />
     </>
   );
 }

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { getUsersListQuerySchema, updateUserBodySchema } from '../schemas';
-
-import { ItemListOptions, SortDirection } from '@modules/core';
+import { ItemListOptions } from '@modules/core';
 import { EMPLOYEE_ROLE } from '@modules/users';
+
+import { updateUserBodySchema } from '../schemas';
 
 export type User = {
   id: number;
@@ -20,6 +20,7 @@ export type UserWithRole = {
   email: string;
   startWorksAt: Date | null;
   endWorksAt: Date | null;
+  roleId: number;
   role: EMPLOYEE_ROLE;
   name: string;
 };

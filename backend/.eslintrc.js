@@ -1,19 +1,14 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  settings: {
-    'import/resolver': {
-      'alias': {
-        'map': [
-          ["@modules", "./src/modules"],
-        ],
-        'extensions': ['.ts', '.tsx'],
-      },
-    },
-  },
   parserOptions: {
     project: 'tsconfig.json',
     tsconfigRootDir : __dirname,
     sourceType: 'module',
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
   },
   plugins: ['@typescript-eslint/eslint-plugin', 'eslint-plugin-import'],
   extends: [
@@ -29,24 +24,18 @@ module.exports = {
     "import/order": [
       "error",
       {
-        "newlines-between": 'always',
-        'alphabetize': {
-          'order': 'asc',
-          'caseInsensitive': true
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc' /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */,
+          caseInsensitive: true /* ignore case. Options: [true, false] */,
         },
-        "groups": [
-          "builtin",
-          "external",
-          "parent",
-          "sibling",
-          "index"
-        ],
-        "pathGroups": [
+        pathGroups: [
           {
-            "pattern": "@**",
-            "group": "external",
-            "position": "after",
-          }
+            pattern: '@modules/**',
+            group: 'internal',
+            position: 'after',
+          },
         ],
       },
     ],

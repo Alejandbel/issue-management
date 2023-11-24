@@ -1,14 +1,15 @@
 import { injectable } from 'inversify';
-import { Client, QueryResult, QueryResultRow } from 'pg';
+import migrate from 'node-pg-migrate';
+import { Client, QueryResult, QueryResultRow, types } from 'pg';
 
 import { ConfigService } from '../config';
-import migrate from 'node-pg-migrate';
 
 @injectable()
 export class DatabaseClient {
   client: Client;
 
   constructor(configService: ConfigService) {
+    types.setTypeParser(20, parseInt);
     this.client = new Client({
       database: configService.get('DB_DATABASE'),
       password: configService.get('DB_PASS'),

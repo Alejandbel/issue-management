@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 
+import { EntityNotFoundError, ServiceError } from '@modules/core';
+
 import { AccountsRepository } from '../repositories';
 import { Account, AccountsListOptions, AccountToUpdate } from '../types';
-
-import { EntityNotFoundError, ServiceError } from '@modules/core';
 
 @injectable()
 export class AccountsService {

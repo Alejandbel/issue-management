@@ -3,10 +3,10 @@ import { inject } from 'inversify';
 import { BaseMiddleware } from 'inversify-express-utils';
 import jwt from 'jsonwebtoken';
 
+import { UnauthorizedError } from '@modules/core';
+
 import { ACCESS_TOKEN_COOKIE } from '../contants';
 import { JwtService } from '../services/jwt.service';
-
-import { UnauthorizedError } from '@modules/core';
 
 export class AuthorizedMiddleware extends BaseMiddleware {
   @inject(JwtService) private readonly jwtService: JwtService;

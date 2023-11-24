@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 
-import { User, UserWithRole } from '../types';
-
 import { DatabaseClient, BaseRepository } from '@modules/core';
+
+import { User, UsersListOptions, UserWithRole } from '../types';
 
 @injectable()
 export class UsersRepository extends BaseRepository<User> {
@@ -10,7 +10,10 @@ export class UsersRepository extends BaseRepository<User> {
     super('user', databaseClient);
   }
 
-  async findOneWithRole(options: Partial<User> = {}): Promise<UserWithRole | undefined> {
+  async findWithRoles(
+    where: Partial<User>,
+    { offset, limit, sortDirection, sortField }: Partial<UsersListOptions>,
+  ): Promise<UserWithRole[]> {
     const [query, params] = this.databaseClient.escapeQueryWithParameters(
       `
           SELECT "user"."id",
@@ -18,17 +21,30 @@ export class UsersRepository extends BaseRepository<User> {
                  "user"."name",
                  "user"."startWorksAt",
                  "user"."endWorksAt",
+                 "user"."roleId",
                  "er"."title" AS "role"
           FROM "user"
                    INNER JOIN "employee_role" "er" ON "user"."roleId" = "er"."id"
           WHERE TRUE
-            ${this.formWhereClause(options)}
-          LIMIT 1
+              ${this.formWhereClause(where)}
+          ${
+            sortField && sortDirection
+              ? ` ORDER BY "${this.entityName}"."${sortField.toString()}" ${sortDirection}`
+              : ''
+          }
+          ${limit ? ' LIMIT :limit' : ''} 
+          ${offset ? ' OFFSET :offset' : ''}
+          ;
       `,
-      options,
+      { ...where, sortField, sortDirection, offset, limit },
     );
 
-    const result = await this.databaseClient.query<UserWithRole>(query, params);
-    return result.rows[0];
+    const res = await this.databaseClient.query<UserWithRole>(query, params);
+    return res.rows;
+  }
+
+  async findOneWithRole(where: Partial<User> = {}): Promise<UserWithRole | undefined> {
+    const [user] = await this.findWithRoles(where, { limit: 1 });
+    return user;
   }
 }

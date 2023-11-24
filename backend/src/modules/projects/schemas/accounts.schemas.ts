@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { ACCOUNT_SORT_FIELD } from '../types';
-
 import { numberSchema, sortDirectionSchema } from '@modules/core';
+
+import { ACCOUNT_SORT_FIELD } from '../types';
 
 export const getAccountsListQuerySchema = z
   .object({

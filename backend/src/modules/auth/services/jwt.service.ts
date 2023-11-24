@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 import jwt from 'jsonwebtoken';
 
-import { InFlightUser } from '../types';
-
 import { ConfigService } from '@modules/core';
+
+import { InFlightUser } from '../types';
 
 @injectable()
 export class JwtService {
