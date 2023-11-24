@@ -7,13 +7,14 @@ import { z } from 'zod';
 import { UserForm } from '@/app/users/UserForm';
 import { Table, TableColumn } from '@/components/Table';
 import { usersService } from '@/services/api';
-import { SortDirection, User, UserWithRole } from '@/types';
+import { SortDirection, UserWithRole } from '@/types';
 import { validateForm } from '@/utils';
 
 const userSchema = z.object({
   id: z.coerce.number(),
-  startWorksAt: z.coerce.date(),
-  endWorksAt: z.coerce.date(),
+  startWorksAt: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.date().optional()),
+  endWorksAt: z.coerce.date().optional(),
+  roleId: z.coerce.number(),
 });
 
 export function UsersTable() {
@@ -99,7 +100,7 @@ export function UsersTable() {
     await refetch();
   };
 
-  const form = (defaultUser?: Omit<User, 'password'>) => <UserForm defaultUser={defaultUser} />;
+  const form = (defaultUser?: UserWithRole) => <UserForm defaultUser={defaultUser} />;
 
   return (
     <Table

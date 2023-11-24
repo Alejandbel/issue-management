@@ -58,7 +58,6 @@ export function Table<T extends Record<string, Parsable>>({
   const paginated = Array.from(new Array(totalRecords), () => undefined) as unknown as Record<string, Parsable>[];
 
   paginated.splice(offset, limit, ...items);
-  console.log(paginated);
 
   const hideDialog = () => {
     setIsVisible(false);
@@ -149,8 +148,6 @@ export function Table<T extends Record<string, Parsable>>({
             } : {}),
             body: (data: T) => getTemplate<T>(data, column.field, column.type ?? column.template),
           };
-
-          console.log(props);
 
           return <Column key={column.field.toString()} {...props} />;
         })}
