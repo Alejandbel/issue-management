@@ -52,6 +52,19 @@ export class BaseRepository<TEntity extends Record<string, unknown> & { id: numb
     return res.rows.length;
   }
 
+  async deleteById(id: number): Promise<void> {
+    const [query, params] = this.databaseClient.escapeQueryWithParameters(
+      `
+          DELETE FROM "${this.entityName}"
+          WHERE "id" = :id
+          ;
+      `,
+      { id },
+    );
+
+    await this.databaseClient.query(query, params);
+  }
+
   async find(
     where: Partial<TEntity> = {},
     {

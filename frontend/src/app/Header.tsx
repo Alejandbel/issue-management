@@ -27,6 +27,10 @@ export function Header() {
       command: () => router.push('/accounts'),
     },
     {
+      label: 'Departments',
+      command: () => router.push('/departments'),
+    },
+    {
       label: 'Sign up',
       icon: 'pi pi-fw pi-user',
       command: () => router.push('/sign-up'),

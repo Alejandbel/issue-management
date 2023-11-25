@@ -45,7 +45,7 @@ export class AccountsService {
     const account = await this.accountsRepository.findOne(options);
 
     if (!account) {
-      throw new EntityNotFoundError('User');
+      throw new EntityNotFoundError('Account');
     }
 
     return account;

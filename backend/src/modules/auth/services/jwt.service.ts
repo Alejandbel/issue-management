@@ -13,7 +13,7 @@ export class JwtService {
     return jwt.sign(
       {
         id: user.id,
-        role: user.id,
+        role: user.role,
       },
       this.configService.get('JWT_SECRET'),
       {

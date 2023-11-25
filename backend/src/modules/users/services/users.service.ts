@@ -5,9 +5,12 @@ import { EntityNotFoundError } from '@modules/core';
 import { UsersRepository } from '../repositories';
 import { User, UsersListOptions, UserToUpdate, UserWithRole } from '../types';
 
+import { EmployeeRolesService } from './employee-roles.service';
+
 @injectable()
 export class UsersService {
   @inject(UsersRepository) private readonly usersRepository: UsersRepository;
+  @inject(EmployeeRolesService) private readonly employeeRolesService: EmployeeRolesService;
 
   async findWithRolesWithCount(options: UsersListOptions): Promise<[UserWithRole[], number]> {
     return Promise.all([this.usersRepository.findWithRoles({}, options), this.usersRepository.count()]);
@@ -29,6 +32,9 @@ export class UsersService {
 
   async updateOne(id: number, user: UserToUpdate): Promise<void> {
     await this.findOneOrFail({ id });
+    if (user.roleId) {
+      await this.employeeRolesService.findOneOrFail({ id: user.roleId });
+    }
     await this.usersRepository.updateById(id, user);
   }
 

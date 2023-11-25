@@ -11,7 +11,7 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { AuthorizedMiddleware } from '@modules/auth/middlewares';
+import { AuthorizedMiddleware, roles } from '@modules/auth/middlewares';
 import {
   applyBodyValidation,
   applyParamsValidation,
@@ -19,6 +19,7 @@ import {
   idParamsSchema,
   ParamsId,
 } from '@modules/core';
+import { EMPLOYEE_ROLE } from '@modules/users';
 
 import { createAccountBodySchema, getAccountsListQuerySchema, updateAccountBodySchema } from '../schemas';
 import { AccountsService } from '../services';
@@ -28,8 +29,13 @@ import { AccountsListOptions, AccountToUpdate } from '../types';
 export class AccountsController extends BaseHttpController {
   @inject(AccountsService) private readonly accountsService: AccountsService;
 
-  @httpGet('/', AuthorizedMiddleware, applyQueryValidation(getAccountsListQuerySchema))
-  async getAccountsList(@queryParam() query: AccountsListOptions): Promise<IHttpActionResult> {
+  @httpGet(
+    '/',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.ADMIN]),
+    applyQueryValidation(getAccountsListQuerySchema),
+  )
+  async getProjectsList(@queryParam() query: AccountsListOptions): Promise<IHttpActionResult> {
     const [items, count] = await this.accountsService.findWithCount(query);
     return this.json({ items, count });
   }

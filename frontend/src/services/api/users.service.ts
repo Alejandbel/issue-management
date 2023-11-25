@@ -18,7 +18,7 @@ export const usersService = {
     return data;
   },
 
-  updateUser: async (id: number, user: Pick<User, 'endWorksAt' | 'startWorksAt'>) => {
+  updateUser: async (id: number, user: Pick<User, 'endWorksAt' | 'startWorksAt' | 'roleId'>) => {
     await axios.patch(`/users/${id}`, user);
   },
 };

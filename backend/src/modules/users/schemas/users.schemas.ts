@@ -17,6 +17,7 @@ export const updateUserBodySchema = z
   .object({
     startWorksAt: dateSchema.optional(),
     endWorksAt: dateSchema.optional(),
+    roleId: z.number(),
   })
   .strip()
   .required();

@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import React, { useState } from 'react';
 
 import { employeeRolesService } from '@/services/api';
-import { UserWithRole } from '@/types';
+import { EmployeeRole, UserWithRole } from '@/types';
 
 type UserFormProps = {
   defaultUser?: UserWithRole;
@@ -19,7 +19,7 @@ export function UserForm({ defaultUser }: UserFormProps) {
     queryFn: () => employeeRolesService.getRoles(),
   });
 
-  const [selectedRole, setSelectedRole] = useState();
+  const [selectedRoleId, setSelectedRoleId] = useState<number>();
 
   if (isLoading || !isSuccess) {
     return null;
@@ -38,7 +38,7 @@ export function UserForm({ defaultUser }: UserFormProps) {
       <label htmlFor="startWorksAt" className="block text-900 font-medium mb-2">Start works at</label>
       <Calendar
         id="startWorksAt"
-        value={new Date(defaultUser?.startWorksAt ?? null)}
+        value={defaultUser?.startWorksAt ? new Date(defaultUser?.startWorksAt) : null}
         name="startWorksAt"
         className="w-full mb-3"
       />
@@ -46,16 +46,17 @@ export function UserForm({ defaultUser }: UserFormProps) {
       <label htmlFor="endWorksAt" className="block text-900 font-medium mb-2">End works at</label>
       <Calendar
         id="endWorksAt"
-        value={new Date(defaultUser?.endWorksAt ?? null)}
+        value={defaultUser?.endWorksAt ? new Date(defaultUser?.endWorksAt) : null}
         name="endWorksAt"
         className="w-full mb-3"
       />
 
       <Dropdown
-        value={selectedRole ?? data?.items?.find((role) => role.id === defaultUser?.roleId)}
-        onChange={(e) => setSelectedRole(e.value)}
+        value={selectedRoleId ?? defaultUser?.roleId}
+        onChange={(e) => setSelectedRoleId(e.value)}
         options={data.items}
         name="roleId"
+        optionValue="id"
         optionLabel="title"
         className="w-full md:w-14rem"
       />

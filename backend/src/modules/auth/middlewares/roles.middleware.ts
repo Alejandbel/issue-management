@@ -6,6 +6,7 @@ import { EMPLOYEE_ROLE } from '@modules/users';
 export const roles =
   (allowedRoles: EMPLOYEE_ROLE[]) =>
   (req: Request, res: Response, next: NextFunction): void => {
+    console.log(req.user);
     if (!allowedRoles.includes(req.user?.role as EMPLOYEE_ROLE)) {
       return next(new ForbiddenError('No access to endpoint'));
     }

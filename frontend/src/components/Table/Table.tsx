@@ -22,10 +22,11 @@ type TableProps<T extends Record<string, Parsable>> = {
   offset?: number;
   limit?: number;
   limitStep?: number;
+  onDelete?: (item?: T) => void | Promise<void>;
 } & ({
   onSave: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   dialogForm: (defaultItem?: T) => React.ReactNode;
-  actions: ('delete' | 'update' | 'create')[]
+  actions: ('update' | 'create')[]
 } | {
   onSave?: undefined;
   dialogForm?: undefined;
@@ -45,6 +46,7 @@ export function Table<T extends Record<string, Parsable>>({
   dialogForm,
   onSave,
   actions,
+  onDelete,
 }: TableProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -93,7 +95,10 @@ export function Table<T extends Record<string, Parsable>>({
   };
 
   const actionBodyTemplate = (rowData: T) => (
-    <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} />
+    <>
+      <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} />
+      {onDelete && <Button icon="pi pi-trash" rounded outlined className="mr-2" severity="danger" onClick={() => onDelete(rowData)} />}
+    </>
   );
 
   return (
