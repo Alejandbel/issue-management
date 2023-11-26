@@ -4,23 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import React, { FormEvent, useState } from 'react';
 import { z } from 'zod';
 
-import { DepartmentForm } from '@/app/departments/DepartmentForm';
+import { UserForm } from './UserForm';
 import { Table, TableColumn } from '@/components/Table';
-import { departmentsService } from '@/services/api';
-import { Department, SortDirection } from '@/types';
+import { usersService } from '@/services/api';
+import { SortDirection, UserWithRole } from '@/types';
 import { validateForm } from '@/utils';
 
-export const departmentBodySchema = z
-  .object({
-    id: z.preprocess(Number, z.number())
-      .optional(),
-    title: z.string()
-      .max(255),
-  })
-  .strip();
+const userSchema = z.object({
+  id: z.coerce.number(),
+  startWorksAt: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.date().optional()),
+  endWorksAt: z.coerce.date().optional(),
+  roleId: z.coerce.number(),
+});
 
-export function DepartmentsTable() {
-  const [sortField, setSortField] = useState('title');
+export function UsersTable() {
+  const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
   const [offset, setOffset] = useState<number | undefined>(0);
@@ -32,8 +30,8 @@ export function DepartmentsTable() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['/accounts', sortField, sortDirection, limit, offset],
-    queryFn: () => departmentsService.getDepartments({
+    queryKey: ['/users', sortField, sortDirection, limit, offset],
+    queryFn: () => usersService.getUsers({
       sortField,
       sortDirection,
       limit,
@@ -45,7 +43,7 @@ export function DepartmentsTable() {
     return null;
   }
 
-  const columns: TableColumn<Department>[] = [
+  const columns: TableColumn<UserWithRole>[] = [
     {
       field: 'id',
       header: 'Id',
@@ -53,9 +51,32 @@ export function DepartmentsTable() {
       sortable: true,
     },
     {
-      field: 'title',
-      header: 'Title',
+      field: 'name',
+      header: 'Name',
       type: 'string',
+      sortable: true,
+    },
+    {
+      field: 'role',
+      header: 'Employee role',
+      type: 'string',
+    },
+    {
+      field: 'email',
+      header: 'Email',
+      type: 'string',
+      sortable: true,
+    },
+    {
+      field: 'startWorksAt',
+      header: 'Start works at',
+      type: 'date',
+      sortable: true,
+    },
+    {
+      field: 'endWorksAt',
+      header: 'End works at',
+      type: 'date',
       sortable: true,
     },
   ];
@@ -70,25 +91,16 @@ export function DepartmentsTable() {
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const department = validateForm(event.currentTarget, departmentBodySchema);
+    const user = validateForm(event.currentTarget, userSchema);
 
-    if (department.id) {
-      await departmentsService.updateDepartment(department.id, department);
-    } else {
-      await departmentsService.createDepartment(department);
+    if (user.id) {
+      await usersService.updateUser(user.id, user);
     }
 
     await refetch();
   };
 
-  const onDelete = async (item?: Department) => {
-    if (item?.id) {
-      await departmentsService.deleteDepartment(item.id);
-      await refetch();
-    }
-  };
-
-  const form = (department?: Department) => <DepartmentForm defaultDepartment={department} />;
+  const form = (defaultUser?: UserWithRole) => <UserForm defaultUser={defaultUser} />;
 
   return (
     <Table
@@ -102,9 +114,8 @@ export function DepartmentsTable() {
       defaultSortOrder={sortDirection}
       limitStep={5}
       onSave={onSave}
-      onDelete={onDelete}
       dialogForm={form}
-      actions={['update', 'create']}
+      actions={['update']}
     />
   );
 }

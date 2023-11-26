@@ -10,7 +10,7 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { AuthorizedMiddleware } from '@modules/auth/middlewares';
+import { AuthorizedMiddleware, roles } from '@modules/auth/middlewares';
 import {
   applyBodyValidation,
   applyParamsValidation,
@@ -21,7 +21,7 @@ import {
 
 import { getUsersListQuerySchema, updateUserBodySchema } from '../schemas';
 import { UsersService } from '../services';
-import { UsersListOptions, UserToUpdate } from '../types';
+import { EMPLOYEE_ROLE, UsersListOptions, UserToUpdate } from '../types';
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
@@ -33,7 +33,20 @@ export class UsersController extends BaseHttpController {
     return this.json({ items, count });
   }
 
-  @httpPatch('/:id', applyParamsValidation(idParamsSchema), applyBodyValidation(updateUserBodySchema))
+  @httpGet('/me', AuthorizedMiddleware)
+  async getSelf(): Promise<IHttpActionResult> {
+    const { id } = this.httpContext.request.user!;
+    const user = await this.usersService.findOneOrFail({ id });
+    return this.ok(user);
+  }
+
+  @httpPatch(
+    '/:id',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.ADMIN]),
+    applyParamsValidation(idParamsSchema),
+    applyBodyValidation(updateUserBodySchema),
+  )
   async updateUser(@requestParam() { id }: ParamsId, @requestBody() user: UserToUpdate): Promise<IHttpActionResult> {
     await this.usersService.updateOne(id, user);
     return this.ok();

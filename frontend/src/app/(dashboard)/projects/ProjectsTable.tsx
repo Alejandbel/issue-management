@@ -4,20 +4,24 @@ import { useQuery } from '@tanstack/react-query';
 import React, { FormEvent, useState } from 'react';
 import { z } from 'zod';
 
-import { UserForm } from '@/app/users/UserForm';
+import { ProjectForm } from './ProjectForm';
 import { Table, TableColumn } from '@/components/Table';
-import { usersService } from '@/services/api';
-import { SortDirection, UserWithRole } from '@/types';
+import { projectsService } from '@/services/api';
+import { Project, ProjectWithRelations, SortDirection } from '@/types';
 import { validateForm } from '@/utils';
 
-const userSchema = z.object({
-  id: z.coerce.number(),
-  startWorksAt: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.date().optional()),
-  endWorksAt: z.coerce.date().optional(),
-  roleId: z.coerce.number(),
-});
+export const projectBodySchema = z
+  .object({
+    id: z.preprocess(Number, z.number()).optional(),
+    name: z.string().max(255),
+    key: z.string().max(16),
+    departmentId: z.coerce.number(),
+    accountId: z.coerce.number(),
+    leadId: z.optional(z.coerce.number()),
+  })
+  .strip();
 
-export function UsersTable() {
+export function ProjectsTable() {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
@@ -30,8 +34,8 @@ export function UsersTable() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['/users', sortField, sortDirection, limit, offset],
-    queryFn: () => usersService.getUsers({
+    queryKey: ['/projects', sortField, sortDirection, limit, offset],
+    queryFn: () => projectsService.getProjects({
       sortField,
       sortDirection,
       limit,
@@ -43,7 +47,7 @@ export function UsersTable() {
     return null;
   }
 
-  const columns: TableColumn<UserWithRole>[] = [
+  const columns: TableColumn<ProjectWithRelations>[] = [
     {
       field: 'id',
       header: 'Id',
@@ -57,27 +61,25 @@ export function UsersTable() {
       sortable: true,
     },
     {
-      field: 'role',
-      header: 'Employee role',
-      type: 'string',
-    },
-    {
-      field: 'email',
-      header: 'Email',
+      field: 'key',
+      header: 'Key',
       type: 'string',
       sortable: true,
     },
     {
-      field: 'startWorksAt',
-      header: 'Start works at',
-      type: 'date',
-      sortable: true,
+      field: 'lead',
+      header: 'Lead',
+      type: 'string',
     },
     {
-      field: 'endWorksAt',
-      header: 'End works at',
-      type: 'date',
-      sortable: true,
+      field: 'account',
+      header: 'Account',
+      type: 'string',
+    },
+    {
+      field: 'department',
+      header: 'Department',
+      type: 'string',
     },
   ];
 
@@ -91,18 +93,18 @@ export function UsersTable() {
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const user = validateForm(event.currentTarget, userSchema);
+    const project = validateForm(event.currentTarget, projectBodySchema);
 
-    console.log(user);
-
-    if (user.id) {
-      await usersService.updateUser(user.id, user);
+    if (project.id) {
+      await projectsService.updateProject(project.id, project);
+    } else {
+      await projectsService.createProject(project);
     }
 
     await refetch();
   };
 
-  const form = (defaultUser?: UserWithRole) => <UserForm defaultUser={defaultUser} />;
+  const form = (project?: Project) => <ProjectForm defaultProject={project} />;
 
   return (
     <Table
@@ -117,7 +119,7 @@ export function UsersTable() {
       limitStep={5}
       onSave={onSave}
       dialogForm={form}
-      actions={['update']}
+      actions={['update', 'create']}
     />
   );
 }

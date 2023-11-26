@@ -4,19 +4,17 @@ import { useRouter } from 'next/navigation';
 import { MenuItem } from 'primereact/menuitem';
 import { TabMenu } from 'primereact/tabmenu';
 
+import { useAuth } from '@/hooks';
+
 export function Header() {
   const router = useRouter();
+  const { user } = useAuth();
 
   const items: MenuItem[] = [
     {
       label: 'Home',
       icon: 'pi pi-fw pi-home',
       command: () => router.push('/'),
-    },
-    {
-      label: 'Sign in',
-      icon: 'pi pi-fw pi-user',
-      command: () => router.push('/sign-in'),
     },
     {
       label: 'Users',
@@ -31,10 +29,17 @@ export function Header() {
       command: () => router.push('/departments'),
     },
     {
-      label: 'Sign up',
-      icon: 'pi pi-fw pi-user',
-      command: () => router.push('/sign-up'),
+      label: 'Projects',
+      command: () => router.push('/projects'),
     },
+    ...(user ? [
+      {
+        label: 'Logout',
+        icon: 'pi pi-fw pi-user',
+        command: () => router.push('/logout'),
+      },
+    ]
+      : []),
   ];
 
   return (

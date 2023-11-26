@@ -7,7 +7,7 @@ export const departmentsService = {
     sortDirection?: SortDirection,
     limit?: number,
     offset?: number
-  }): Promise<{ items: Department[], count: number }> => {
+  } = {}): Promise<{ items: Department[], count: number }> => {
     const { data } = await axios.get('/departments', {
       params,
     });

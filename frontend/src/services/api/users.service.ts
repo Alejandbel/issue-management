@@ -7,13 +7,19 @@ export const usersService = {
     sortDirection?: SortDirection,
     limit?: number,
     offset?: number
-  }, cookie?: string): Promise<{ items: UserWithRole[], count: number }> => {
+  } = {}, cookie?: string): Promise<{ items: UserWithRole[], count: number }> => {
     const { data } = await axios.get('/users', {
       params,
       headers: {
         ...(cookie ? { Cookie: cookie } : {}),
       },
     });
+
+    return data;
+  },
+
+  getSelf: async (): Promise<User> => {
+    const { data } = await axios.get('/users/me');
 
     return data;
   },

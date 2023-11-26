@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import React, { useState } from 'react';
 
 import { employeeRolesService } from '@/services/api';
-import { EmployeeRole, UserWithRole } from '@/types';
+import { UserWithRole } from '@/types';
 
 type UserFormProps = {
   defaultUser?: UserWithRole;

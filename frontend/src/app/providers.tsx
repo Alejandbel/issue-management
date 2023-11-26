@@ -1,15 +1,27 @@
 'use client';
 
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PrimeReactProvider } from 'primereact/api';
 import React, { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
+
+import { AuthProvider } from '@/contexts/AuthContext';
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = useState(new QueryClient());
 
   return (
-    <QueryClientProvider client={client}>
-      {children}
-    </QueryClientProvider>
+    <PrimeReactProvider>
+      <QueryClientProvider client={client}>
+        <AuthProvider>
+          {children}
+          <Toaster
+            position="top-right"
+            toastOptions={{ duration: 3000 }}
+          />
+        </AuthProvider>
+      </QueryClientProvider>
+    </PrimeReactProvider>
   );
 }
 

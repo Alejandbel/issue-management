@@ -123,6 +123,7 @@ export class BaseRepository<TEntity extends Record<string, unknown> & { id: numb
 
   protected formWhereClause(where: Partial<TEntity>, entityName: string = this.entityName): string {
     return Object.keys(where)
+      .filter((key) => where[key])
       .map((key) => `AND "${entityName}"."${key}" = :${key}`)
       .join('\n');
   }

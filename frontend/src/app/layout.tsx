@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { PrimeReactProvider } from 'primereact/api';
 import React from 'react';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
@@ -9,7 +8,6 @@ import 'primeicons/primeicons.css';
 
 import 'primeflex/primeflex.css';
 
-import { Header } from './Header';
 import Providers from '@/app/providers';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -27,14 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full m-0 overflow-hidden">
       <body className={`flex flex-column h-full m-0 overflow-hidden ${inter.className}`}>
-        <PrimeReactProvider>
-          <Header />
-          <main className="flex-grow-1 m-2">
-            <Providers>
-              {children}
-            </Providers>
-          </main>
-        </PrimeReactProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -21,37 +21,43 @@ import {
 } from '@modules/core';
 import { EMPLOYEE_ROLE } from '@modules/users';
 
-import { createAccountBodySchema, getAccountsListQuerySchema, updateAccountBodySchema } from '../schemas';
-import { AccountsService } from '../services';
-import { AccountsListOptions, AccountToUpdate } from '../types';
+import { createProjectBodySchema, getProjectsListQuerySchema, updateProjectBodySchema } from '../schemas';
+import { ProjectsService } from '../services';
+import { ProjectListOptions, ProjectToCreate, ProjectToUpdate } from '../types';
 
-@controller('/accounts')
-export class AccountsController extends BaseHttpController {
-  @inject(AccountsService) private readonly accountsService: AccountsService;
+@controller('/projects')
+export class ProjectsController extends BaseHttpController {
+  @inject(ProjectsService) private readonly projectsService: ProjectsService;
 
-  @httpGet(
-    '/',
-    AuthorizedMiddleware,
-    roles([EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.ADMIN]),
-    applyQueryValidation(getAccountsListQuerySchema),
-  )
-  async getProjectsList(@queryParam() query: AccountsListOptions): Promise<IHttpActionResult> {
-    const [items, count] = await this.accountsService.findWithCount(query);
+  @httpGet('/', AuthorizedMiddleware, applyQueryValidation(getProjectsListQuerySchema))
+  async getProjectsList(@queryParam() query: ProjectListOptions): Promise<IHttpActionResult> {
+    const [items, count] = await this.projectsService.findWithCount(query);
     return this.json({ items, count });
   }
 
-  @httpPost('/', applyBodyValidation(createAccountBodySchema))
-  async createAccount(@requestBody() account: AccountToUpdate): Promise<IHttpActionResult> {
-    await this.accountsService.create(account);
+  @httpPost(
+    '/',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.ADMIN]),
+    applyBodyValidation(createProjectBodySchema),
+  )
+  async createProject(@requestBody() project: ProjectToCreate): Promise<IHttpActionResult> {
+    await this.projectsService.create(project);
     return this.ok();
   }
 
-  @httpPatch('/:id', applyParamsValidation(idParamsSchema), applyBodyValidation(updateAccountBodySchema))
-  async updateAccount(
+  @httpPatch(
+    '/:id',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.ADMIN]),
+    applyParamsValidation(idParamsSchema),
+    applyBodyValidation(updateProjectBodySchema),
+  )
+  async updateProject(
     @requestParam() { id }: ParamsId,
-    @requestBody() account: Required<AccountToUpdate>,
+    @requestBody() project: ProjectToUpdate,
   ): Promise<IHttpActionResult> {
-    await this.accountsService.updateOne(id, account);
+    await this.projectsService.updateOne(id, project);
     return this.ok();
   }
 }

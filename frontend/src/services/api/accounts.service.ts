@@ -7,7 +7,7 @@ export const accountsService = {
     sortDirection?: SortDirection,
     limit?: number,
     offset?: number
-  }, cookie?: string): Promise<{ items: Account[], count: number }> => {
+  } = {}, cookie?: string): Promise<{ items: Account[], count: number }> => {
     const { data } = await axios.get('/accounts', {
       params,
       headers: {
