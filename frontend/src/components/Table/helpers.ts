@@ -24,6 +24,8 @@ export function getTemplate<
         return (value as unknown as Date).toString();
       case 'numeric':
         return value as number;
+      case 'logical':
+        return value.toString();
       default:
         throw new Error('Unknown type');
     }

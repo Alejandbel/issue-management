@@ -10,6 +10,7 @@ export const getVersionListQuerySchema = z
     sortField: z.enum(Object.values(VERSION_SORT_FIELD) as [string, ...string[]]).nullish(),
     limit: numberSchema.optional(),
     offset: numberSchema.optional(),
+    projectId: numberSchema.optional(),
   })
   .strip();
 

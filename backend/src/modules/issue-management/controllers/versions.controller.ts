@@ -24,7 +24,7 @@ import { EMPLOYEE_ROLE } from '@modules/users';
 
 import { createVersionBodySchema, getVersionListQuerySchema, updateVersionBodySchema } from '../schemas';
 import { VersionsService } from '../services';
-import { VersionListOptions, VersionToUpdate } from '../types';
+import { VersionListOptions, VersionToCreate } from '../types';
 
 @controller('/versions')
 export class VersionsController extends BaseHttpController {
@@ -39,10 +39,10 @@ export class VersionsController extends BaseHttpController {
   @httpPost(
     '/',
     AuthorizedMiddleware,
-    roles([EMPLOYEE_ROLE.ADMIN, EMPLOYEE_ROLE.PROJECT_MANAGER]),
+    roles([EMPLOYEE_ROLE.ADMIN, EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.USER]),
     applyBodyValidation(createVersionBodySchema),
   )
-  async createVersion(@requestBody() versionToUpdate: VersionToUpdate): Promise<IHttpActionResult> {
+  async createVersion(@requestBody() versionToUpdate: VersionToCreate): Promise<IHttpActionResult> {
     await this.versionsService.create(versionToUpdate);
     return this.ok();
   }
@@ -56,7 +56,7 @@ export class VersionsController extends BaseHttpController {
   )
   async updateVersion(
     @requestParam() { id }: ParamsId,
-    @requestBody() version: Required<VersionToUpdate>,
+    @requestBody() version: Required<VersionToCreate>,
   ): Promise<IHttpActionResult> {
     await this.versionsService.updateOne(id, version);
     return this.ok();

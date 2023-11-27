@@ -3,16 +3,18 @@
 import { SortOrder } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
-import { DataTable, DataTableStateEvent } from 'primereact/datatable';
+import {
+  DataTable, DataTableExpandedRows, DataTableStateEvent, DataTableValueArray,
+} from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
 import React, { FormEvent, useRef, useState } from 'react';
 
 import { getTemplate } from './helpers';
-import { Parsable, TableColumn } from './types';
+import { TableColumn } from './types';
 import { NumberToSortDirection, SortDirection, SortDirectionToNumber } from '@/types';
 
-type TableProps<T extends Record<string, Parsable>> = {
+type TableProps<T extends Record<string, unknown>> = {
   items: T[];
   onStateChange?: (sortField: string, sortDirection?: SortDirection, limit?: number, offset?: number) => void | Promise<void>;
   columns: TableColumn<T>[];
@@ -22,7 +24,11 @@ type TableProps<T extends Record<string, Parsable>> = {
   offset?: number;
   limit?: number;
   limitStep?: number;
+  size?: 'small' | 'normal' | 'large';
+  rowExpansionTemplate?: (item: T) => React.ReactNode;
+  onRowClick?: (item: T) => void | Promise<void>;
   onDelete?: (item?: T) => void | Promise<void>;
+  paginate?: boolean;
 } & ({
   onSave: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   dialogForm: (defaultItem?: T) => React.ReactNode;
@@ -33,7 +39,7 @@ type TableProps<T extends Record<string, Parsable>> = {
   actions?: undefined;
 });
 
-export function Table<T extends Record<string, Parsable>>({
+export function Table<T extends Record<string, unknown>>({
   items,
   onStateChange,
   columns,
@@ -47,6 +53,10 @@ export function Table<T extends Record<string, Parsable>>({
   onSave,
   actions,
   onDelete,
+  onRowClick,
+  rowExpansionTemplate,
+  paginate = true,
+  size,
 }: TableProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -55,9 +65,10 @@ export function Table<T extends Record<string, Parsable>>({
   );
   const [sortFiled, setSortFiled] = useState(defaultSortField);
   const [defaultItem, setDefaultItem] = useState<T | undefined>();
+  const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows | DataTableValueArray>();
 
   // workaround for pagination
-  const paginated = Array.from(new Array(totalRecords), () => undefined) as unknown as Record<string, Parsable>[];
+  const paginated = Array.from(new Array(totalRecords), () => undefined) as unknown as Record<string, unknown>[];
 
   paginated.splice(offset, limit, ...items);
 
@@ -132,17 +143,22 @@ export function Table<T extends Record<string, Parsable>>({
         sortField={sortFiled?.toString()}
         sortOrder={sortOrder}
         stripedRows
-        paginator
+        paginator={paginate}
         rows={limit}
         rowsPerPageOptions={[limitStep, limitStep * 2, limitStep * 5, limitStep * 10]}
         first={offset}
         onPage={stateChangeFunction}
         onSort={stateChangeFunction}
+        rowExpansionTemplate={rowExpansionTemplate}
+        expandedRows={expandedRows}
+        onRowToggle={rowExpansionTemplate ? (e) => setExpandedRows(e.data) : undefined}
         editMode="cell"
-        size="large"
+        size={size}
         className="m-2"
+        onRowClick={(e) => onRowClick?.(e.data as T)}
         tableStyle={{ minWidth: '50rem' }}
       >
+        {rowExpansionTemplate && <Column expander={() => true} style={{ width: '5rem' }} />}
         {columns.map((column) => {
           const props: Record<string, unknown> = {
             header: column.header,

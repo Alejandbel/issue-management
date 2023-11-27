@@ -1,5 +1,7 @@
 import { SortDirection } from '@modules/core';
 
+import { IssueWithTypeAndStatus } from './issues.types';
+
 export type Version = {
   id: number;
   title: string;
@@ -10,7 +12,9 @@ export type Version = {
   createdAt: Date;
 };
 
-export type VersionToUpdate = Omit<Version, 'id' | 'createdAt'>;
+export type VersionWithIssues = Version & { issues: IssueWithTypeAndStatus[] };
+
+export type VersionToCreate = Omit<Version, 'id' | 'createdAt'>;
 
 export enum VERSION_SORT_FIELD {
   ID = 'id',
@@ -23,6 +27,7 @@ export enum VERSION_SORT_FIELD {
 export type VersionListOptions = {
   sortField?: VERSION_SORT_FIELD;
   sortDirection?: SortDirection;
+  projectId?: number;
   limit?: number;
   offset?: number;
 };

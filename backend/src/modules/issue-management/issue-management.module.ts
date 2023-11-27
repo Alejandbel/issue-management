@@ -7,7 +7,7 @@ import * as Services from './services';
 const repositories = Object.values(Repositories);
 const services = Object.values(Services);
 
-export const versionsModule = new AsyncContainerModule(async (bind) => {
+export const issueManagementModule = new AsyncContainerModule(async (bind) => {
   services.forEach((service) => bind(service as any).toSelf());
   repositories.forEach((repository) => bind(repository as any).toSelf());
 });

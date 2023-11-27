@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react';
 import { z } from 'zod';
 
@@ -26,6 +27,8 @@ export function ProjectsTable() {
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
   const [offset, setOffset] = useState<number | undefined>(0);
+
+  const router = useRouter();
 
   const {
     data,
@@ -104,6 +107,10 @@ export function ProjectsTable() {
     await refetch();
   };
 
+  const onRowClick = (item: ProjectWithRelations) => {
+    router.push(`/projects/${item.id}`, {});
+  };
+
   const form = (project?: Project) => <ProjectForm defaultProject={project} />;
 
   return (
@@ -120,6 +127,7 @@ export function ProjectsTable() {
       onSave={onSave}
       dialogForm={form}
       actions={['update', 'create']}
+      onRowClick={onRowClick}
     />
   );
 }

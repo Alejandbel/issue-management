@@ -1,4 +1,5 @@
 -- Up Migration
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS "user_activity_type"
 (
@@ -178,8 +179,9 @@ CREATE TABLE IF NOT EXISTS "user_salary"
     );
 CREATE INDEX IF NOT EXISTS "worklog_userid_index" ON "user_salary" ("userId");
 
-
+COMMIT;
 -- Down Migration
+BEGIN;
 
 ALTER TABLE "worklog" DROP CONSTRAINT IF EXISTS "worklog_authorid_index";
 ALTER TABLE "worklog" DROP CONSTRAINT IF EXISTS "worklog_issueid_index";
@@ -224,3 +226,5 @@ DROP TABLE IF EXISTS "department";
 DROP TABLE IF EXISTS "user_activity_type";
 
 DROP FUNCTION IF EXISTS "get_user_role_id";
+
+COMMIT;

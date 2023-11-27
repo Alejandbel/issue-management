@@ -2,4 +2,4 @@ export * from './controllers';
 export * from './services';
 export * from './types';
 
-export * from './versions.module';
+export * from './issue-management.module';
