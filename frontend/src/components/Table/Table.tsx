@@ -29,6 +29,7 @@ type TableProps<T extends Record<string, unknown>> = {
   onRowClick?: (item: T) => void | Promise<void>;
   onDelete?: (item?: T) => void | Promise<void>;
   paginate?: boolean;
+  scrollable?: boolean;
 } & ({
   onSave: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   dialogForm: (defaultItem?: T) => React.ReactNode;
@@ -57,6 +58,7 @@ export function Table<T extends Record<string, unknown>>({
   rowExpansionTemplate,
   paginate = true,
   size,
+  scrollable,
 }: TableProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -139,6 +141,8 @@ export function Table<T extends Record<string, unknown>>({
         </Dialog>
       )}
       <DataTable
+        scrollable={scrollable}
+        scrollHeight="40rem"
         value={paginated}
         sortField={sortFiled?.toString()}
         sortOrder={sortOrder}

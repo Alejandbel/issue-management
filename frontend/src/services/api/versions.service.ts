@@ -20,11 +20,11 @@ export const versionsService = {
     await axios.post('/versions', version);
   },
 
-  updateDepartment: async (id: number, version: Partial<VersionToCreate>) => {
+  updateVersion: async (id: number, version: Partial<VersionToCreate>) => {
     await axios.patch(`/versions/${id}`, version);
   },
 
-  deleteDepartment: async (id: number) => {
+  deleteVersion: async (id: number) => {
     await axios.delete(`/versions/${id}`);
   },
 };

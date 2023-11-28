@@ -51,6 +51,7 @@ export function UserForm({ defaultUser }: UserFormProps) {
         className="w-full mb-3"
       />
 
+      <label htmlFor="roleId" className="block text-900 font-medium mb-2">Employee role</label>
       <Dropdown
         value={selectedRoleId ?? defaultUser?.roleId}
         onChange={(e) => setSelectedRoleId(e.value)}

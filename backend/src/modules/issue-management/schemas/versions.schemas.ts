@@ -19,8 +19,8 @@ export const createVersionBodySchema = z
     title: z.string().max(255).optional(),
     isArchived: z.boolean().optional(),
     projectId: z.number(),
-    startDate: z.date(),
-    releaseDate: z.date().nullish(),
+    startDate: z.coerce.date(),
+    releaseDate: z.coerce.date().nullish(),
   })
   .strip();
 

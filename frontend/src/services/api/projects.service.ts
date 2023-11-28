@@ -7,7 +7,7 @@ export const projectsService = {
     sortDirection?: SortDirection,
     limit?: number,
     offset?: number
-  }): Promise<{ items: ProjectWithRelations[], count: number }> => {
+  } = {}): Promise<{ items: ProjectWithRelations[], count: number }> => {
     const { data } = await axios.get('/projects', {
       params,
     });

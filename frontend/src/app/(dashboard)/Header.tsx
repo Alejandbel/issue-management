@@ -32,6 +32,10 @@ export function Header() {
       label: 'Projects',
       command: () => router.push('/projects'),
     },
+    {
+      label: 'Salaries',
+      command: () => router.push('/salaries'),
+    },
     ...(user ? [
       {
         label: 'Logout',
