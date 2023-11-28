@@ -9,13 +9,11 @@ export type Issue = {
   dueDate: Date;
   description: string;
   statusId: number;
-  projectId: number;
-  startDate: Date;
-  releaseDate?: Date | null;
   createdAt: Date;
 };
 
-export type IssueWithTypeAndStatus = Issue & {
+export type IssueWithTypeStatusTotalTime = Issue & {
   type: string;
   status: string;
+  totalTimeSpent: number;
 };

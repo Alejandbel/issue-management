@@ -15,7 +15,11 @@ export type Issue = {
   createdAt: Date;
 };
 
-export type IssueWithTypeAndStatus = Issue & {
+export type IssueWithTypeStatusTotalTime = Issue & {
   type: string;
   status: string;
+  totalTimeSpent: number;
 };
+
+export type IssueToCreate = Omit<Issue, 'id' | 'createdAt'>;
+export type IssueToUpdate = Partial<IssueToCreate>;

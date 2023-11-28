@@ -2,16 +2,16 @@ import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 
 import { AuthContext } from '@/contexts/AuthContext';
-import { User } from '@/types';
+import { Role, UserWithRole } from '@/types';
 
-export function useAuth(): { user: User | null };
-export function useAuth(redirect: string): { user: User };
-export function useAuth(redirect?: string) {
+export function useAuth(): { user: UserWithRole | null };
+export function useAuth(redirect: string, allowedRoles?: Role[]): { user: UserWithRole };
+export function useAuth(redirect?: string, allowedRoles?: Role[]) {
   const router = useRouter();
 
   const { user } = useContext(AuthContext);
 
-  if (!user && redirect) {
+  if (redirect && (!user || (allowedRoles && !allowedRoles.includes(user.role)))) {
     return router.push(redirect);
   }
 

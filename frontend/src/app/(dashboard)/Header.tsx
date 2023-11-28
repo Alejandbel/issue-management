@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks';
 
 export function Header() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useAuth('/sign-in');
 
   const items: MenuItem[] = [
     {
@@ -16,10 +16,10 @@ export function Header() {
       icon: 'pi pi-fw pi-home',
       command: () => router.push('/'),
     },
-    {
+    ...(user.role === 'admin' ? [{
       label: 'Users',
       command: () => router.push('/users'),
-    },
+    }] : []),
     {
       label: 'Accounts',
       command: () => router.push('/accounts'),
@@ -32,18 +32,15 @@ export function Header() {
       label: 'Projects',
       command: () => router.push('/projects'),
     },
-    {
+    ...(['admin', 'sales'].includes(user.role) ? [{
       label: 'Salaries',
       command: () => router.push('/salaries'),
+    }] : []),
+    {
+      label: 'Logout',
+      icon: 'pi pi-fw pi-user',
+      command: () => router.push('/logout'),
     },
-    ...(user ? [
-      {
-        label: 'Logout',
-        icon: 'pi pi-fw pi-user',
-        command: () => router.push('/logout'),
-      },
-    ]
-      : []),
   ];
 
   return (

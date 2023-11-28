@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { ProjectForm } from './ProjectForm';
 import { Table, TableColumn } from '@/components/Table';
+import { useAuth } from '@/hooks';
 import { projectsService } from '@/services/api';
 import { Project, ProjectWithRelations, SortDirection } from '@/types';
 import { validateForm } from '@/utils';
@@ -23,6 +24,7 @@ export const projectBodySchema = z
   .strip();
 
 export function ProjectsTable() {
+  const { user } = useAuth('/sign-in');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
@@ -126,7 +128,7 @@ export function ProjectsTable() {
       limitStep={5}
       onSave={onSave}
       dialogForm={form}
-      actions={['update', 'create']}
+      actions={['admin', 'project_manager']?.includes(user.role) ? ['update', 'create'] : []}
       onRowClick={onRowClick}
     />
   );

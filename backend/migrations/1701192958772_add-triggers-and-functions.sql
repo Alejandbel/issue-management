@@ -39,8 +39,8 @@ CREATE OR REPLACE FUNCTION "log_user_worklog_deleted_action"() RETURNS TRIGGER A
 $$
 BEGIN
     INSERT INTO "user_activity" ("userId", "activityTypeId")
-    VALUES ("old"."userId",
-            (SELECT "activityTypeId" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog deleted'));
+    VALUES ("old"."authorId",
+            (SELECT "id" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog deleted'));
     RETURN "old";
 END
 $$ LANGUAGE "plpgsql";
@@ -56,8 +56,8 @@ CREATE OR REPLACE FUNCTION "log_user_worklog_updated_action"() RETURNS TRIGGER A
 $$
 BEGIN
     INSERT INTO "user_activity" ("userId", "activityTypeId")
-    VALUES ("old"."userId",
-            (SELECT "activityTypeId" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog updated'));
+    VALUES ("old"."authorId",
+            (SELECT "id" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog updated'));
     RETURN "old";
 END
 $$ LANGUAGE "plpgsql";
@@ -73,14 +73,14 @@ CREATE OR REPLACE FUNCTION "log_user_worklog_created_action"() RETURNS TRIGGER A
 $$
 BEGIN
     INSERT INTO "user_activity" ("userId", "activityTypeId")
-    VALUES ("old"."userId",
-            (SELECT "activityTypeId" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog created'));
+    VALUES ("old"."authorId",
+            (SELECT "id" FROM "user_activity_type" "type" WHERE "type"."title" = 'Worklog created'));
     RETURN "old";
 END
 $$ LANGUAGE "plpgsql";
 
 CREATE OR REPLACE TRIGGER "log_user_worklog_created_action_trigger"
-    AFTER UPDATE
+    AFTER INSERT
     ON "worklog"
     FOR EACH ROW
 EXECUTE FUNCTION "log_user_worklog_created_action"();

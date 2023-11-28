@@ -39,7 +39,7 @@ export class VersionsController extends BaseHttpController {
   @httpPost(
     '/',
     AuthorizedMiddleware,
-    roles([EMPLOYEE_ROLE.ADMIN, EMPLOYEE_ROLE.PROJECT_MANAGER, EMPLOYEE_ROLE.USER]),
+    roles([EMPLOYEE_ROLE.ADMIN, EMPLOYEE_ROLE.PROJECT_MANAGER]),
     applyBodyValidation(createVersionBodySchema),
   )
   async createVersion(@requestBody() versionToUpdate: VersionToCreate): Promise<IHttpActionResult> {

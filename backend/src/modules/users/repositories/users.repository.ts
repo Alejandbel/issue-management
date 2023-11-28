@@ -22,7 +22,8 @@ export class UsersRepository extends BaseRepository<User> {
                  "user"."startWorksAt",
                  "user"."endWorksAt",
                  "user"."roleId",
-                 "er"."title" AS "role"
+                 "er"."title" AS "role",
+                 get_user_last_salary_change_date("user"."id") AS "lastSalaryChangeDate"
           FROM "user"
                    INNER JOIN "employee_role" "er" ON "user"."roleId" = "er"."id"
           WHERE TRUE

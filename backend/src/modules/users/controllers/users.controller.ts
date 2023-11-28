@@ -36,7 +36,7 @@ export class UsersController extends BaseHttpController {
   @httpGet('/me', AuthorizedMiddleware)
   async getSelf(): Promise<IHttpActionResult> {
     const { id } = this.httpContext.request.user!;
-    const user = await this.usersService.findOneOrFail({ id });
+    const user = await this.usersService.findOneWithRoleOrFail({ id });
     return this.ok(user);
   }
 

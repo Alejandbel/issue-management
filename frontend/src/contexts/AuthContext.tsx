@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 
 import { usersService } from '@/services/api';
-import { User } from '@/types';
+import { UserWithRole } from '@/types';
 
-export const AuthContext = React.createContext<{ user?: User | null }>({});
+export const AuthContext = React.createContext<{ user?: UserWithRole | null }>({});
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const { data: user, isLoading } = useQuery({

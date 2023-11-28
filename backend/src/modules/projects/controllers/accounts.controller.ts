@@ -11,7 +11,7 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { AuthorizedMiddleware } from '@modules/auth/middlewares';
+import { AuthorizedMiddleware, roles } from '@modules/auth/middlewares';
 import {
   applyBodyValidation,
   applyParamsValidation,
@@ -19,6 +19,7 @@ import {
   idParamsSchema,
   ParamsId,
 } from '@modules/core';
+import { EMPLOYEE_ROLE } from '@modules/users';
 
 import { createAccountBodySchema, getAccountsListQuerySchema, updateAccountBodySchema } from '../schemas';
 import { AccountsService } from '../services';
@@ -34,13 +35,24 @@ export class AccountsController extends BaseHttpController {
     return this.json({ items, count });
   }
 
-  @httpPost('/', applyBodyValidation(createAccountBodySchema))
+  @httpPost(
+    '/',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.SALES, EMPLOYEE_ROLE.ADMIN]),
+    applyBodyValidation(createAccountBodySchema),
+  )
   async createAccount(@requestBody() account: AccountToUpdate): Promise<IHttpActionResult> {
     await this.accountsService.create(account);
     return this.ok();
   }
 
-  @httpPatch('/:id', applyParamsValidation(idParamsSchema), applyBodyValidation(updateAccountBodySchema))
+  @httpPatch(
+    '/:id',
+    AuthorizedMiddleware,
+    roles([EMPLOYEE_ROLE.SALES, EMPLOYEE_ROLE.ADMIN]),
+    applyParamsValidation(idParamsSchema),
+    applyBodyValidation(updateAccountBodySchema),
+  )
   async updateAccount(
     @requestParam() { id }: ParamsId,
     @requestBody() account: Required<AccountToUpdate>,

@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { AccountForm } from './AccountForm';
 import { TableColumn, Table } from '@/components/Table';
+import { useAuth } from '@/hooks';
 import { accountsService } from '@/services/api/accounts.service';
 import { Account, SortDirection } from '@/types';
 import { validateForm } from '@/utils';
@@ -19,6 +20,7 @@ export const accountBodySchema = z
   .strip();
 
 export function AccountsTable() {
+  const { user } = useAuth('/sign-in');
   const [sortField, setSortField] = useState('title');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
@@ -101,7 +103,7 @@ export function AccountsTable() {
       limitStep={5}
       onSave={onSave}
       dialogForm={form}
-      actions={['update', 'create']}
+      actions={['admin', 'sales'].includes(user.role) ? ['update', 'create'] : []}
     />
   );
 }

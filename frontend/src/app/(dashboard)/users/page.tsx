@@ -1,6 +1,11 @@
-import { UsersTable } from './UsersTable';
+'use client';
 
-export default async function Page() {
+import { UsersTable } from './UsersTable';
+import { useAuth } from '@/hooks';
+
+export default function Page() {
+  useAuth('/', ['admin']);
+
   return (
     <div className="card">
       <UsersTable />

@@ -127,11 +127,6 @@ CREATE TABLE IF NOT EXISTS "project_sales_users"
 CREATE INDEX IF NOT EXISTS "project_sales_users_projectid_index" ON "project_sales_users" ("projectId");
 CREATE INDEX IF NOT EXISTS "project_sales_users_userid_index" ON "project_sales_users" ("userId");
 
-CREATE TABLE IF NOT EXISTS "issue_type"
-(
-    "id"    SERIAL PRIMARY KEY NOT NULL,
-    "title" VARCHAR(255)       NOT NULL
-    );
 
 CREATE TABLE IF NOT EXISTS "issue"
 (

@@ -18,7 +18,7 @@ export const usersService = {
     return data;
   },
 
-  getSelf: async (): Promise<User> => {
+  getSelf: async (): Promise<UserWithRole> => {
     const { data } = await axios.get('/users/me');
 
     return data;

@@ -2,15 +2,16 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { Checkbox } from 'primereact/checkbox';
 import React, { FormEvent, useState } from 'react';
 import { z } from 'zod';
 
+import { IssuesTable } from '@/app/(dashboard)/projects/[id]/IssuesTable';
 import { VersionForm } from '@/app/(dashboard)/projects/[id]/VersionsForm';
 import { Table, TableColumn } from '@/components/Table';
+import { useAuth } from '@/hooks';
 import { versionsService } from '@/services/api';
-import {
-  IssueWithTypeAndStatus, SortDirection, Version, VersionWithIssues,
-} from '@/types';
+import { SortDirection, Version, VersionWithIssues } from '@/types';
 import { validateForm } from '@/utils';
 
 export const versionBodySchema = z
@@ -20,10 +21,13 @@ export const versionBodySchema = z
     projectId: z.coerce.number(),
     isArchived: z.coerce.boolean().default(false),
     startDate: z.coerce.date(),
+    releaseDate: z.optional(z.coerce.date()),
   })
   .strip();
 
 export function ProjectVersionsTable() {
+  const { user } = useAuth('/sign-in');
+
   const { id } = useParams();
   const projectId = Number(id);
 
@@ -69,8 +73,8 @@ export function ProjectVersionsTable() {
     {
       field: 'isArchived',
       header: 'Is Archived',
-      type: 'string',
       sortable: true,
+      template: (val) => <Checkbox checked={Boolean(val)} readOnly />,
     },
     {
       field: 'startDate',
@@ -107,21 +111,7 @@ export function ProjectVersionsTable() {
     await refetch();
   };
 
-  const rowExpansionTemplate = (item: VersionWithIssues) => {
-    const issuesColumns: TableColumn<IssueWithTypeAndStatus>[] = [
-      { field: 'id', header: 'Id', type: 'numeric' },
-      { field: 'summary', header: 'Summary', type: 'string' },
-      { field: 'key', header: 'Key', type: 'string' },
-      { field: 'type', header: 'Type', type: 'string' },
-      { field: 'status', header: 'Status', type: 'string' },
-      { field: 'description', header: 'Description', type: 'string' },
-      { field: 'hoursEstimated', header: 'Estimated', template: (hours) => `${hours}h` },
-      { field: 'startDate', header: 'Start date', type: 'date' },
-      { field: 'dueDate', header: 'Due date', type: 'date' },
-    ];
-
-    return <Table size="small" items={item.issues} columns={issuesColumns} paginate={false} />;
-  };
+  const rowExpansionTemplate = (item: VersionWithIssues) => <IssuesTable issues={item.issues} refetch={refetch} versionId={item.id} />;
 
   const form = (version: Partial<Version> = {}) => <VersionForm defaultVersion={{ projectId, ...version }} />;
 
@@ -138,7 +128,7 @@ export function ProjectVersionsTable() {
       defaultSortOrder={sortDirection}
       dialogForm={form}
       onSave={onSave}
-      actions={['update', 'create']}
+      actions={['admin', 'project_manager']?.includes(user.role) ? ['update', 'create'] : []}
       limitStep={5}
       rowExpansionTemplate={rowExpansionTemplate}
     />

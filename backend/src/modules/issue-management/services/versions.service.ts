@@ -11,7 +11,7 @@ export class VersionsService {
 
   async findWithCount(options: VersionListOptions): Promise<[VersionWithIssues[], number]> {
     return Promise.all([
-      this.versionsRepository.findWithIssues({ projectId: options.projectId }),
+      this.versionsRepository.findWithIssues({ projectId: options.projectId }, options),
       this.versionsRepository.count({ projectId: options.projectId }),
     ]);
   }

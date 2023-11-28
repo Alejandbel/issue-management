@@ -30,6 +30,7 @@ type TableProps<T extends Record<string, unknown>> = {
   onDelete?: (item?: T) => void | Promise<void>;
   paginate?: boolean;
   scrollable?: boolean;
+  additionalActionsTemplate?: (item: T) => React.ReactNode;
 } & ({
   onSave: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   dialogForm: (defaultItem?: T) => React.ReactNode;
@@ -59,6 +60,7 @@ export function Table<T extends Record<string, unknown>>({
   paginate = true,
   size,
   scrollable,
+  additionalActionsTemplate,
 }: TableProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -109,8 +111,18 @@ export function Table<T extends Record<string, unknown>>({
 
   const actionBodyTemplate = (rowData: T) => (
     <>
-      <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} />
-      {onDelete && <Button icon="pi pi-trash" rounded outlined className="mr-2" severity="danger" onClick={() => onDelete(rowData)} />}
+      {additionalActionsTemplate?.(rowData)}
+      {actions?.includes('update') ? <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} /> : null}
+      {onDelete && (
+      <Button
+        icon="pi pi-trash"
+        rounded
+        outlined
+        className="mr-2"
+        severity="danger"
+        onClick={() => onDelete(rowData)}
+      />
+      )}
     </>
   );
 
@@ -176,7 +188,7 @@ export function Table<T extends Record<string, unknown>>({
 
           return <Column key={column.field.toString()} {...props} />;
         })}
-        {actions?.includes('update') ? <Column body={actionBodyTemplate} /> : null}
+        {actions?.includes('update') || additionalActionsTemplate || onDelete ? <Column body={actionBodyTemplate} /> : null}
       </DataTable>
     </>
   );

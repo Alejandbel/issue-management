@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { DepartmentForm } from './DepartmentForm';
 import { Table, TableColumn } from '@/components/Table';
+import { useAuth } from '@/hooks';
 import { departmentsService } from '@/services/api';
 import { Department, SortDirection } from '@/types';
 import { validateForm } from '@/utils';
@@ -20,6 +21,7 @@ export const departmentBodySchema = z
   .strip();
 
 export function DepartmentsTable() {
+  const { user } = useAuth('/sign-in');
   const [sortField, setSortField] = useState('title');
   const [sortDirection, setSortDirection] = useState<SortDirection | undefined>(SortDirection.ASC);
   const [limit, setLimit] = useState<number | undefined>(5);
@@ -102,9 +104,9 @@ export function DepartmentsTable() {
       defaultSortOrder={sortDirection}
       limitStep={5}
       onSave={onSave}
-      onDelete={onDelete}
+      onDelete={user.role === 'admin' ? onDelete : undefined}
       dialogForm={form}
-      actions={['update', 'create']}
+      actions={['admin'].includes(user.role) ? ['update', 'create'] : []}
     />
   );
 }

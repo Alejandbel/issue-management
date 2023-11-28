@@ -4,7 +4,6 @@ import { Checkbox } from 'primereact/checkbox';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import React, { useState } from 'react';
-import { z } from 'zod';
 
 import { projectsService } from '@/services/api';
 import { Version } from '@/types';
@@ -56,7 +55,7 @@ export function VersionForm({ defaultVersion }: VersionFormProps) {
         className="w-full mb-3"
       />
 
-      <label htmlFor="releaseDate" className="block text-900 font-medium mb-2">Start date</label>
+      <label htmlFor="releaseDate" className="block text-900 font-medium mb-2">Release date</label>
       <Calendar
         id="releaseDate"
         value={defaultVersion?.releaseDate ? new Date(defaultVersion?.releaseDate) : null}

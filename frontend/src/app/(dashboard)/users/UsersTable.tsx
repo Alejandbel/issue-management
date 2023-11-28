@@ -68,6 +68,12 @@ export function UsersTable() {
       sortable: true,
     },
     {
+      // @ts-expect-error TODO
+      field: 'lastSalaryChangeDate',
+      header: 'Last salary change date',
+      type: 'date',
+    },
+    {
       field: 'startWorksAt',
       header: 'Start works at',
       type: 'date',

@@ -7,3 +7,4 @@ export * from './projects.types';
 export * from './user-salaries.types';
 export * from './users.types';
 export * from './versions.types';
+export * from './worklogs.types';

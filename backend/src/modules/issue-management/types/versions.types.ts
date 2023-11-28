@@ -1,6 +1,6 @@
 import { SortDirection } from '@modules/core';
 
-import { IssueWithTypeAndStatus } from './issues.types';
+import { IssueWithTypeStatusTotalTime } from './issues.types';
 
 export type Version = {
   id: number;
@@ -12,7 +12,7 @@ export type Version = {
   createdAt: Date;
 };
 
-export type VersionWithIssues = Version & { issues: IssueWithTypeAndStatus[] };
+export type VersionWithIssues = Version & { issues: IssueWithTypeStatusTotalTime[] };
 
 export type VersionToCreate = Omit<Version, 'id' | 'createdAt'>;
 

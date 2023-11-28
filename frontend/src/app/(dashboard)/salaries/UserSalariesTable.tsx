@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { UserSalaryForm } from './UserSalaryForm';
 import { Table, TableColumn } from '@/components/Table';
+import { useAuth } from '@/hooks';
 import { userSalariesService } from '@/services/api';
 import { UserSalaryWithUser } from '@/types';
 import { validateForm } from '@/utils';
@@ -23,6 +24,8 @@ type UserSalariesTableProps = {
 };
 
 export function UserSalariesTable({ month, year }: UserSalariesTableProps) {
+  useAuth('/', ['sales', 'admin']);
+
   const {
     data,
     isSuccess,
